@@ -152,7 +152,7 @@ def move_common_files(src1, src2, dst):
             os.rename(src2_path, dst_path)
 
 # move_common_files('../Person1', '../Person2', '../Person3')
-change_extension(input("File Path:"))
+# change_extension(input("File Path:"))
 # move_largest_files('Person2','Person1' , 15)
 # move_random_files('Person1', 'Person2', 20)
 # special_rename_files('Person3')
