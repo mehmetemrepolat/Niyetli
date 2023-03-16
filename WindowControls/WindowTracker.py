@@ -6,6 +6,7 @@ import time
 import keyboard
 import pyautogui
 
+
 sleep_time = 1
 
 
@@ -25,6 +26,7 @@ def change_window(repeat=1):
 
 
 # Aktif pencerenin adını almak için fonksiyon
+
 def get_active_window_title():
     window = win32gui.GetForegroundWindow()
     _, pid = win32process.GetWindowThreadProcessId(window)

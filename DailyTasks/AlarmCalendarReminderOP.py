@@ -8,20 +8,20 @@ import struct
 import time
 
 
-def get_date(today = date.today()):
-    if today != date.today():
-        return date.today() + timedelta(today)
+def get_date(today_d=date.today()):
+    if today_d != date.today():
+        return date.today() + timedelta(today_d)
     else:
-        return today
+        return today_d
 
 
-def get_date_w_string(date):
+def get_date_w_string(date_input):
     # date = date.strftime()
-    return date.strftime("%B %d, %Y")
+    return date_input.strftime("%B %d, %Y")
 
 
-def get_date_only_number(date):
-    return date.split()[1].replace(",", "")
+def get_date_only_number(date_input):
+    return date_input.split()[1].replace(",", "")
 
 
 def show_balloon(title, msg):
@@ -42,7 +42,6 @@ def show_balloon(title, msg):
         hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
     except:
         hicon = LoadIcon(0, win32con.IDI_APPLICATION)
-
     flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
     nid = (hwnd, 0, flags, win32con.WM_USER + 20, hicon, "tooltip")
     Shell_NotifyIcon(NIM_ADD, nid)
@@ -57,24 +56,13 @@ def OnDestroy(hwnd, msg, wparam, lparam):
     Shell_NotifyIcon(NIM_DELETE, nid)
     PostQuitMessage(0)
 
-
-
-show_balloon("Niyetli'den mesaj var!", "Merhabalar")
-
-today = datetime.today()
-tomorrow = datetime.today()+timedelta(+1)
-
-print(datetime.now().strftime("%H:%M"))
-
-print(today.strftime("%B %d, %Y"))
-
-print("Yarın:", tomorrow.strftime("%B %d, %Y"))
-
-print(get_date())
-
-print(get_date(-19))
-
-print(get_date_w_string(get_date(2)))
-
-print(get_date_only_number(get_date_w_string(get_date(3))))
-
+# show_balloon("Niyetli'den mesaj var!", "Merhabalar")
+# today = datetime.today()
+# tomorrow = datetime.today()+timedelta(+1)
+# print(datetime.now().strftime("%H:%M"))
+# print(today.strftime("%B %d, %Y"))
+# print("Yarın:", tomorrow.strftime("%B %d, %Y"))
+# print(get_date())
+# print(get_date(-19))
+# print(get_date_w_string(get_date(2)))
+# print(get_date_only_number(get_date_w_string(get_date(3))))
