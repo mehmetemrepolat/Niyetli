@@ -165,30 +165,24 @@ def get_folder_ext_types(_path):
 
 
 def copy_or_transport_spesify_ext_files(_path, _dest_path, _spc_ext, method = True):
-    total_files = len(os.listdir(_path))
-    spc_ext_files = []
-    for xq in range(0, total_files):
-        if os.listdir(_path)[xq] == _spc_ext:
-            spc_ext_files.append(os.listdir(_path)[xq])
-
-    processed_files = len(spc_ext_files)
-
-    with tqdm(total = processed_files) as pbar:
+    file_list = os.listdir(_path)
+    total_files = len(file_list)
+    with tqdm(total = total_files) as pbar:  # ilerleme çubuğu oluşturma
         for xx in range(0, total_files):
-            file_name = os.listdir(_path)[xx]
+            file_name = file_list[xx]
             if get_extension(file_name) == _spc_ext:
-                if method:
+                if method == '1':
                     shutil.copy(f'{_path}/{file_name}', _dest_path)
                 else:
                     shutil.move(f'{_path}/{file_name}', _dest_path)
-                    total_files -= 1
-                pbar.update(1)
+                    total_files = len(os.listdir(_path))
+                pbar.update(1)  # ilerleme çubuğunu güncelleme
 
 
 
 folder_path = ''
 dest_path = ''
-copy_or_transport_spesify_ext_files(folder_path, dest_path, '.AAE', 0)
+copy_or_transport_spesify_ext_files(dest_path, folder_path, '.AAE', 0)
 
 
 #print(get_folder_ext_types(folder_path))
@@ -197,7 +191,7 @@ copy_or_transport_spesify_ext_files(folder_path, dest_path, '.AAE', 0)
 #    #print(get_extension(os.listdir(folder_path)[x]))
 #    file_name = os.listdir(folder_path)[x]
 #    if get_extension(file_name) == '.PNG':
-#        print("Hello ")
+#        print("Hello mother fucker")
 #        shutil.copy(f'{folder_path}/{file_name}', dest_path)
 #    else:
 #        pass
