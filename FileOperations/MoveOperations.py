@@ -1,8 +1,10 @@
 import os
 import heapq
 import random
+import shutil
 from os.path import exists
 from datetime import datetime, timedelta
+from tqdm import tqdm
 
 
 
@@ -150,6 +152,57 @@ def move_common_files(src1, src2, dst):
         if src1_ext != src2_ext:
            # os.rename(src1_path, dst_path)
             os.rename(src2_path, dst_path)
+
+def get_folder_ext_types(_path):
+    ext_types = []
+    folder_files = os.listdir(_path)
+    for xy in range(0, len(os.listdir(_path))):
+        if get_extension(folder_files[xy]) not in ext_types:
+            ext_types.append(get_extension(folder_files[xy]))
+        else:
+            pass
+    return ext_types
+
+
+def copy_or_transport_spesify_ext_files(_path, _dest_path, _spc_ext, method = True):
+    total_files = len(os.listdir(_path))
+    spc_ext_files = []
+    for xq in range(0, total_files):
+        if os.listdir(_path)[xq] == _spc_ext:
+            spc_ext_files.append(os.listdir(_path)[xq])
+
+    processed_files = len(spc_ext_files)
+
+    with tqdm(total = processed_files) as pbar:
+        for xx in range(0, total_files):
+            file_name = os.listdir(_path)[xx]
+            if get_extension(file_name) == _spc_ext:
+                if method:
+                    shutil.copy(f'{_path}/{file_name}', _dest_path)
+                else:
+                    shutil.move(f'{_path}/{file_name}', _dest_path)
+                    total_files -= 1
+                pbar.update(1)
+
+
+
+folder_path = ''
+dest_path = ''
+copy_or_transport_spesify_ext_files(folder_path, dest_path, '.AAE', 0)
+
+
+#print(get_folder_ext_types(folder_path))
+
+#for x in range(0, len(os.listdir(folder_path))):
+#    #print(get_extension(os.listdir(folder_path)[x]))
+#    file_name = os.listdir(folder_path)[x]
+#    if get_extension(file_name) == '.PNG':
+#        print("Hello ")
+#        shutil.copy(f'{folder_path}/{file_name}', dest_path)
+#    else:
+#        pass
+#
+
 
 # move_common_files('../Person1', '../Person2', '../Person3')
 # change_extension(input("File Path:"))
