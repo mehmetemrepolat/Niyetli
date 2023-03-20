@@ -30,9 +30,6 @@ def change_tab(repeat = 1):
         pyautogui.keyUp('ctrl')
 
 
-
-
-
 def go_to_url(url):
     time.sleep(sleep_time)
     pyautogui.hotkey('ctrl', 't')
@@ -60,8 +57,13 @@ def go_forward():
     pyautogui.hotkey('alt', 'right')
 
 
-time.sleep(3)
+# Scroll down işlemini gerçekleştirir
+def scroll_UpDown(pixels):
+    pyautogui.scroll(pixels, x=0, y=0)
 
+
+# time.sleep(3)
+# scroll_UpDown(100)
 # go_to_url("youtube.com")
 # go_back()
 # go_forward()
