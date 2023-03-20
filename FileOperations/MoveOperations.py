@@ -36,21 +36,16 @@ def special_rename_files(path):  # I'm going to fix this later
             else:
                 os.rename(os.path.join(path, file_name), os.path.join(path, new_file_name))
 
-def change_extension(folder_path):
-    if os.path.exists(folder_path):
-        old_extension = input("Enter the extensions that need to be changed:")
-        new_extension = input("Enter the extension to be changed:")
 
+def change_extension(folder_path, old_extension, new_extension):
+    if os.path.exists(folder_path):
+        # old_extension = input("Enter the extensions that need to be changed:")
+        # new_extension = input("Enter the extension to be changed:")
         for filename in os.listdir(folder_path):
             if filename.endswith(old_extension):
                 new_filename = filename.replace(old_extension, new_extension)
                 os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
-    else:
-        new_folder_path = input("Yanlış dosya yolu girildi. Dosya yolunu tekrar giriniz: ")
-        if new_folder_path.lower() == 'esc':
-            return  # programdan çıkış yap
-        else:
-            change_extension(new_folder_path)
+
 
 def move_largest_files(src_folder, dst_folder, top_n):
     files = [(os.path.join(src_folder, file), os.path.getsize(os.path.join(src_folder, file))) for file in os.listdir(src_folder)]
@@ -114,7 +109,6 @@ def move_random_files(src_folder, dst_folder, num_files, file_extension=None):
         os.rename(src_file, dst_file)
 
 
-
 def without_extension(_fileName):
     without_ext = os.path.splitext(_fileName)[0]
     return without_ext
@@ -125,33 +119,36 @@ def get_extension(_fileName):
     return ext
 
 
-def move_common_files(src1, src2, dst):
+def move_common_files(src1, src2, dst, method=True):
     src1_files = os.listdir(src1)
-    print(src1_files)
     src1_files_wo_ext = []
     for x in range(0, len(src1_files)):
         src1_files_wo_ext.append(without_extension(src1_files[x]))
-    print(src1_files_wo_ext)
-
     src2_files_wo_ext = []
     src2_files = os.listdir(src2)
     for y in range(0, len(src2_files)):
         src2_files_wo_ext.append(without_extension(src2_files[y]))
-    print(src2_files_wo_ext)
+    # Ortak isimdeki dosyaları farklı listeye atar.
     common_files = set(src1_files_wo_ext) & set(src2_files_wo_ext)
-    print(len(common_files))
-    for x in range(0, len(common_files)):
-        src1_path = os.path.join(src1, file_name)
-        print(src1_path)
-        src2_path = os.path.join(src2, file_name)
-        print(src2_path)
-        dst_path = os.path.join(dst, file_name)
-        print(dst_path)
-        src1_ext = os.path.splitext(src1_path)[1]
-        src2_ext = os.path.splitext(src2_path)[1]
-        if src1_ext != src2_ext:
-           # os.rename(src1_path, dst_path)
-            os.rename(src2_path, dst_path)
+    common_files_list = []
+    for x in common_files:
+        common_files_list.append(x)
+    del common_files  # Delete common files set
+    # src1 klasörü içerisindeki ortak dosyaları taşıma&kopyalama işlemi
+    for x in range(0, len(src1_files)):
+        if without_extension(src1_files[x]) in common_files_list:
+            if method:
+                shutil.move(f"{src1}/{src1_files[x]}", dst)
+            else:
+                shutil.copy(f"{src1}/{src1_files[x]}", dst)
+    # src2 klasörü içerisindeki ortak dosyaları taşıma&kopyalama işlemi
+    for y in range(0, len(src2_files)):
+        if without_extension(src2_files[y]) in common_files_list:
+            if method:
+                shutil.move(f"{src2}/{src2_files[y]}", dst)
+            else:
+                shutil.copy(f"{src2}/{src2_files[y]}", dst)
+
 
 def get_folder_ext_types(_path):
     ext_types = []
@@ -191,7 +188,7 @@ copy_or_transport_spesify_ext_files(dest_path, folder_path, '.AAE', 0)
 #    #print(get_extension(os.listdir(folder_path)[x]))
 #    file_name = os.listdir(folder_path)[x]
 #    if get_extension(file_name) == '.PNG':
-#        print("Hello mother fucker")
+#        print("")
 #        shutil.copy(f'{folder_path}/{file_name}', dest_path)
 #    else:
 #        pass

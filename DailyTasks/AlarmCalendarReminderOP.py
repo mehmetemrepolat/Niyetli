@@ -56,7 +56,8 @@ def OnDestroy(hwnd, msg, wparam, lparam):
     Shell_NotifyIcon(NIM_DELETE, nid)
     PostQuitMessage(0)
 
-# show_balloon("Niyetli'den mesaj var!", "Merhabalar")
+
+# show_balloon("Niyetli'den mesaj var!", "Hatalar düzeltildi, Performans iyileştirmeleri yapıldı, Kedi videolarıyla kalpler eridi.")
 # today = datetime.today()
 # tomorrow = datetime.today()+timedelta(+1)
 # print(datetime.now().strftime("%H:%M"))

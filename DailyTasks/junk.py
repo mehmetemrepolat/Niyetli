@@ -76,8 +76,8 @@ def run_in_background():
         time.sleep(10)  # 10 saniye bekle
 
 
-
 run_in_background()
+
 # thread = threading.Thread(target=run_in_background)
 # thread.daemon = False  # !Ana program kapatıldığında thread de sonlandırılır
 # thread.start()
