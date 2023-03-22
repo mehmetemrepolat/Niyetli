@@ -1,55 +1,34 @@
-import os
-import shutil
+import time
+import threading
 
+def hatirlatici(saniye):
+    time.sleep(saniye)
+    print("Hatırlatıcı: {} saniye doldu!".format(saniye))
 
-def without_extension(_fileName):
-    without_ext = os.path.splitext(_fileName)[0]
-    return without_ext
+def farkli_metot():
+    x = 1
+    while True:
+        time.sleep(1)
+        x += 1
+        print(x)
 
+def ana_program():
+    while True:
+        secim = input("Hangi işlemi yapmak istersiniz?\n 1. Hatırlatıcıyı başlat\n 2. Başka bir metodu çalıştır\n 3. Çıkış\nSeçiminiz: ")
 
-def get_extension(_fileName):
-    ext = os.path.splitext(_fileName)[1]
-    return ext
+        if secim == "1":
+            saniye = int(input("Hatırlatıcı kaç saniye sonra çalışsın?: "))
+            t = threading.Thread(target=hatirlatici, args=(saniye,))
+            t.start()
 
+        elif secim == "2":
+            farkli_metot()
 
-src1 = "JunkFolders/Person1"
-src2 = "JunkFolders/Person2"
-dst = "JunkFolders/Person3"
-method = False
+        elif secim == "3":
+            print("Program sonlandırıldı.")
+            break
 
-src1_files = os.listdir(src1)
-src1_files_wo_ext = []
-for x in range(0, len(src1_files)):
-    src1_files_wo_ext.append(without_extension(src1_files[x]))
-print(src1_files)
-print(src1_files_wo_ext)
-
-src2_files_wo_ext = []
-src2_files = os.listdir(src2)
-for y in range(0, len(src2_files)):
-    src2_files_wo_ext.append(without_extension(src2_files[y]))
-# print(src2_files_wo_ext)
-# Ortak isimdeki dosyaları farklı listeye atar.
-common_files = set(src1_files_wo_ext) & set(src2_files_wo_ext)
-print("Ortak isimdeki dosyalar:", common_files)
-common_files_list = []
-for x in common_files:
-    common_files_list.append(x)
-del common_files  # Delete common files set
-print(common_files_list)
-
-# src1 klasörü içerisindeki ortak dosyaları taşıma&kopyalama işlemi
-for x in range(0, len(src1_files)):
-    if without_extension(src1_files[x]) in common_files_list:
-        if method:
-            shutil.move(f"{src1}/{src1_files[x]}", dst)
         else:
-            shutil.copy(f"{src1}/{src1_files[x]}", dst)
+            print("Geçersiz seçim! Tekrar deneyin.")
 
-for y in range(0, len(src2_files)):
-    if without_extension(src2_files[y]) in common_files_list:
-        if method:
-            shutil.move(f"{src2}/{src2_files[y]}", dst)
-        else:
-            shutil.copy(f"{src2}/{src2_files[y]}", dst)
-
+ana_program()
