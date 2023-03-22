@@ -1,5 +1,8 @@
 import speech_recognition as sr
 
+# https://www.linkedin.com/feed/update/urn:li:activity:7044235076745707520/
+
+
 r = sr.Recognizer()
 
 with sr.Microphone() as source:
