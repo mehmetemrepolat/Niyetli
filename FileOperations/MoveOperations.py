@@ -149,6 +149,15 @@ def move_common_files(src1, src2, dst, method=True):
             else:
                 shutil.copy(f"{src2}/{src2_files[y]}", dst)
 
+def get_file_names_inFolder(_path):
+    file_names = []
+    folder_files = os.listdir(_path)
+    for xc in range(0, len(folder_files)):
+        file_name = folder_files[xc].split('.')[0]
+        file_names.append(file_name)
+    return file_names
+
+
 
 def get_folder_ext_types(_path):
     ext_types = []
@@ -179,7 +188,7 @@ def copy_or_transport_spesify_ext_files(_path, _dest_path, _spc_ext, method = Tr
 
 folder_path = ''
 dest_path = ''
-copy_or_transport_spesify_ext_files(dest_path, folder_path, '.AAE', 0)
+#copy_or_transport_spesify_ext_files(dest_path, folder_path, '.AAE', 0)
 
 
 #print(get_folder_ext_types(folder_path))
