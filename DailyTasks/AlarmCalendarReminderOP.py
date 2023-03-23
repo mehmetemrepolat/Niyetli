@@ -4,7 +4,6 @@ from win32gui import *
 import win32con
 import sys
 import os
-import struct
 import time
 
 
@@ -61,7 +60,7 @@ def OnDestroy(hwnd, msg, wparam, lparam):
 # today = datetime.today()
 # tomorrow = datetime.today()+timedelta(+1)
 # print(datetime.now().strftime("%H:%M"))
-# print(today.strftime("%B %d, %Y"))
+# print(today.strftime("%A, %B %d, %Y"))
 # print("Yarın:", tomorrow.strftime("%B %d, %Y"))
 # print(get_date())
 # print(get_date(-19))
