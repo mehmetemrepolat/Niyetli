@@ -30,22 +30,23 @@ class Database:
         print(f"{self.cursor.rowcount} satır eklendi.")
 
     def fast_note(self, note):
-        today = datetime.today()
+        if len(note) < 5:
+            note_title = note
+        else:
+            note_title = " ".join(note.split()[:5])
+
         while True:
             try:
-                fastNoteQuery = "INSERT INTO notes (note_title, note, note_create_date, note_category, note_time) VALUES (%s, %s, %s, %s, %s)"
-                note_title = " ".join(note.split()[:5])
-                values = (note_title, note, date.today().isoformat(), 'Fast Note', datetime.now().strftime("%H:%M:%S"))
-                self.cursor.execute(fastNoteQuery, values)
+                cursor = self.db.cursor()
+                fastNoteQuery = "INSERT INTO notes (note_title, note, note_category, note_create_date, note_time) VALUES (%s, %s, %s, %s, %s)"
+                values = (note_title, note, 'Fast Note', date.today().isoformat(), datetime.now().strftime("%H:%M:%S"))
+                cursor.execute(fastNoteQuery, values)
                 self.db.commit()
-                break  # break out of the loop if no exception
-
-            except mysql.connector.IntegrityError as e:
-                if e.errno == 1062:  # Duplicate entry error code
-                    note_title += " *"
-                else:
-                    raise e
-        print(f"{self.cursor.rowcount} satır eklendi.")
+                cursor.close()
+                print("Note added successfully.")
+                break
+            except:
+                note_title += "*"
 
 
     def update_note(self, note_id, note_title=None, note=None, note_create_date=None, note_category=None, note_time=None):
@@ -69,6 +70,24 @@ class Database:
         self.db_connector.db.commit()
 
         print(f"{self.db_connector.cursor.rowcount} satır güncellendi.")
+
+    def get_category(self, note_title):
+        get_category_query = f"SELECT note_category FROM notes WHERE note_title = '{note_title}'"
+        mycursor = self.db.cursor()
+
+        mycursor.execute(get_category_query)
+
+        myresult = mycursor.fetchone()
+
+        if myresult:
+            category = myresult[0]
+            return category
+        else:
+            print(f"{note_title} adlı nota ait kategori bulunamadı.")
+            return None
+
+    def change_category(self, note_title, new_category):
+        change_query = f"UPDATE notes SET note_category = '{new_category}' WHERE note_title = {note_title}"
 
     def delete_note(self, note_title):
         delete_query = f"DELETE FROM notes WHERE note_id = {note_title}"

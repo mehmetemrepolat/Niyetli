@@ -43,10 +43,7 @@ def take_note(note, note_title, file_path="root", note_category="yellow", note_r
 
 # def edit_note(note_id, about_edit, edit)
 # about_edit -> sil, düzenle, yeniden yaz, ekleme yap, çıkarma yap
-
 # def read_note(note_id)
-
-
 # take_note("some1", "some2")
 
 note_title = 'Deneme Notu4'
@@ -55,8 +52,9 @@ note_create_date = '2023-04-02'
 note_category = 'Genel'
 note_time = '10:00'
 
+# print(db.get_category("Deneme Notu4 *"))
 
-# db.fast_note("Hızlı notlar sayfasına hoşgeldiniz. Burası hızlıca notlar alınabilecek ortam ")
+db.fast_note("1. Not")
 
 # db.note_add(note_title, note, note_create_date, note_category, note_time)
 
