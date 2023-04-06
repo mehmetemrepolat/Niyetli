@@ -39,12 +39,6 @@ def take_note(note, note_title, file_path="root", note_category="yellow", note_r
     Contents.close()
 
 
-def fast_note(note):
-    today = datetime.today()
-    # Kullanıcının hızlıca not almasını sağlayacak,
-    # Bu durumda not kategorisini değiştirmek gerekiyor
-    # note_category = 'fast'
-    # Kullanıcı hızlı notları bu kategori üzerinden kontrol edebilecek
 
 
 # def edit_note(note_id, about_edit, edit)
@@ -62,7 +56,9 @@ note_category = 'Genel'
 note_time = '10:00'
 
 
-db.note_add(note_title, note, note_create_date, note_category, note_time)
+# db.fast_note("Hızlı notlar sayfasına hoşgeldiniz. Burası hızlıca notlar alınabilecek ortam ")
+
+# db.note_add(note_title, note, note_create_date, note_category, note_time)
 
 # db.delete_note('Deneme Notu')
 
