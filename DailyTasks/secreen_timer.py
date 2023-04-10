@@ -5,7 +5,7 @@ import win32process
 
 Programs = []  # Çalışan program isimleri listesi
 Times = []  # Çalışma sürelerini tutmak için liste
-
+ignored_programs = [] # Listede görüntülenmesine gerek görülmeyen programlar için. Kullanıcı isterse manuel ekleme yapabilecek.
 def get_ForeGroundApp():
     if psutil.Process(win32process.GetWindowThreadProcessId(GetForegroundWindow())[1]).name().replace(".exe", "") == 'explorer':
         hwnd = GetForegroundWindow()
@@ -13,7 +13,10 @@ def get_ForeGroundApp():
         return title
 
     else:
-        return psutil.Process(win32process.GetWindowThreadProcessId(GetForegroundWindow())[1]).name().replace(".exe", "")
+        hwnd = GetForegroundWindow()
+        title = GetWindowText(hwnd)
+        return title
+        # return psutil.Process(win32process.GetWindowThreadProcessId(GetForegroundWindow())[1]).name().replace(".exe", "")
 
 
 def get_App_index(app):
