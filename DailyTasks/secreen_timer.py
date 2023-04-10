@@ -7,7 +7,13 @@ Programs = []  # Çalışan program isimleri listesi
 Times = []  # Çalışma sürelerini tutmak için liste
 
 def get_ForeGroundApp():
-    return psutil.Process(win32process.GetWindowThreadProcessId(GetForegroundWindow())[1]).name().replace(".exe", "")
+    if psutil.Process(win32process.GetWindowThreadProcessId(GetForegroundWindow())[1]).name().replace(".exe", "") == 'explorer':
+        hwnd = GetForegroundWindow()
+        title = GetWindowText(hwnd)
+        return title
+
+    else:
+        return psutil.Process(win32process.GetWindowThreadProcessId(GetForegroundWindow())[1]).name().replace(".exe", "")
 
 
 def get_App_index(app):
@@ -27,8 +33,10 @@ def secreen_timer():
             is_ForeGroundApp_get_change()
         except:
             pass
+        print(Programs, " - ", Times)
         time.sleep(1)
 
+secreen_timer()
     # Veritabanına ekleme yapılacak şekilde olacak. Bu ekleme günün belirli saatinde gerçekleştirilecek.
     # Veritabanına eklenememesi veya bağlantı hatası gibi konular konusuna önlem olarak Not Defteri veya excel tablosu gibi
     # yapı kullanılıp 'Ram Yedek' şeklinde muhafaza edilecek.
@@ -37,4 +45,3 @@ def secreen_timer():
     # Daha sonraki evrelerde kullanıcı secreen timer özelliğinden faydalanmak istediğinde
     # Veritabanından bütün programlara ait ekran sürelerini hesaplayarak(belirli aralık da çekilebilir.)
     # Kullanıcıya tablo şeklinde sunacak. Veya Niyetli bunu kullanıcıya sesli bir şekilde iletecek.
-    # print(Programs, " - ", Times)
