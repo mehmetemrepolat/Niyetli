@@ -5,7 +5,7 @@ class Database:
     def __init__(self):
         self.config = {
             'user': 'root',
-            'password': '****',
+            'password': '*****',
             'host': 'localhost',
             'database': 'niyetli'
         }
@@ -49,27 +49,7 @@ class Database:
                 note_title += "*"
 
 
-    def update_note(self, note_id, note_title=None, note=None, note_create_date=None, note_category=None, note_time=None):
-        update_query = "UPDATE notes SET "
-        update_fields = []
 
-        if note_title:
-            update_fields.append(f"note_title = '{note_title}'")
-        if note:
-            update_fields.append(f"note = '{note}'")
-        if note_create_date:
-            update_fields.append(f"note_create_date = '{note_create_date}'")
-        if note_category:
-            update_fields.append(f"note_category = '{note_category}'")
-        if note_time:
-            update_fields.append(f"note_time = '{note_time}'")
-
-        update_query += ", ".join(update_fields) + f" WHERE note_id = {note_id}"
-
-        self.db_connector.cursor.execute(update_query)
-        self.db_connector.db.commit()
-
-        print(f"{self.db_connector.cursor.rowcount} satır güncellendi.")
 
     def get_category(self, note_title):
         get_category_query = f"SELECT note_category FROM notes WHERE note_title = '{note_title}'"
@@ -96,9 +76,73 @@ class Database:
 
         print(f"{self.cursor.rowcount} satır silindi.")
 
+    def timer_db_control(self):
+        today = date.today()
+        today_str = today.strftime('%Y-%m-%d')
+        get_timer_query = f"Select * From secreen_timer where secreen_date='{today_str}'"
+        mycursor = self.db.cursor()
+        mycursor.execute(get_timer_query)
+        result = mycursor.fetchall()
+
+        return result
+
+
+    def update_note(self, note_id, note_title=None, note=None, note_create_date=None, note_category=None, note_time=None):
+        update_query = "UPDATE notes SET "
+        update_fields = []
+
+        if note_title:
+            update_fields.append(f"note_title = '{note_title}'")
+        if note:
+            update_fields.append(f"note = '{note}'")
+        if note_create_date:
+            update_fields.append(f"note_create_date = '{note_create_date}'")
+        if note_category:
+            update_fields.append(f"note_category = '{note_category}'")
+        if note_time:
+            update_fields.append(f"note_time = '{note_time}'")
+
+        update_query += ", ".join(update_fields) + f" WHERE note_id = {note_id}"
+
+        self.db_connector.cursor.execute(update_query)
+        self.db_connector.db.commit()
+
+        print(f"{self.db_connector.cursor.rowcount} satır güncellendi.")
+
+    def update_timer(self, program_id, secreen_time, day_counter):
+        today = date.today()
+        today_str = today.strftime('%Y-%m-%d')
+        timer_update_query = f"Update secreen_timer SET secreen_time = secreen_time + {secreen_time}, day_counter = day_counter + {day_counter} where program_id = '{program_id}'"
+
+        self.cursor.execute(timer_update_query)
+        self.db.commit()
+        try:
+            self.cursor.execute(timer_update_query)
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            print("Timer güncellenirken bir hata oluştu:", str(e))
 
 
 
+    def timer_into_database(self, program_id, Program, is_program, time, date_counter=1):
+        self.db.connect()
+
+        data_today = self.timer_db_control()
+
+        if any(item[0] == program_id for item in data_today):
+            self.update_timer(program_id, time, date_counter)
+            return
+        else:
+            cursor = self.db.cursor()
+            data_insert_query = "INSERT INTO secreen_timer ( program_id, program_name, is_program, secreen_time, secreen_date, day_counter)" \
+                                "VALUES(%s, %s, %s, %s, %s, %s)"
+            values = (program_id, Program, is_program, time, date.today(), date_counter)
+            cursor.execute(data_insert_query, values)
+            self.db.commit()
+            cursor.close()
+            print("Data added")
+            return
 """
 note_add(self, note_title, note, note_create_date, note_category, note_time): Bu metot, veritabanına yeni bir not
     eklemek için kullanılır. note_title, note, note_create_date, note_category, ve note_time parametreleri ile 
