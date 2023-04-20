@@ -1,5 +1,5 @@
 import mysql.connector
-from datetime import datetime, date, timedelta, time
+from datetime import datetime, date
 
 class Database:
     def __init__(self):
@@ -104,14 +104,12 @@ class Database:
 
         update_query += ", ".join(update_fields) + f" WHERE note_id = {note_id}"
 
-        self.db_connector.cursor.execute(update_query)
-        self.db_connector.db.commit()
+        self.cursor.execute(update_query)
+        self.db.commit()
 
-        print(f"{self.db_connector.cursor.rowcount} satır güncellendi.")
+        print(f"{self.cursor.rowcount} satır güncellendi.")
 
     def update_timer(self, program_id, secreen_time, day_counter):
-        today = date.today()
-        today_str = today.strftime('%Y-%m-%d')
         timer_update_query = f"Update secreen_timer SET secreen_time = secreen_time + {secreen_time}, day_counter = day_counter + {day_counter} where program_id = '{program_id}'"
 
         try:
@@ -123,7 +121,7 @@ class Database:
 
 
 
-    def timer_into_database(self, program_id, Program, is_program, time, date_counter=1):
+    def timer_into_database(self, program_id, program, is_program, time, date_counter=1):
         self.db.connect()
 
         data_today = self.timer_db_control()
@@ -135,12 +133,32 @@ class Database:
             cursor = self.db.cursor()
             data_insert_query = "INSERT INTO secreen_timer ( program_id, program_name, is_program, secreen_time, secreen_date, day_counter)" \
                                 "VALUES(%s, %s, %s, %s, %s, %s)"
-            values = (program_id, Program, is_program, time, date.today(), date_counter)
+            values = (program_id, program, is_program, time, date.today(), date_counter)
             cursor.execute(data_insert_query, values)
             self.db.commit()
             cursor.close()
             print("Data added")
             return
+
+
+    def reminder_add(self, reminder, reminder_category, reminder_create_date, reminder_create_time, reminder_time, attachment='', reminder_enabled='1'):
+        while True:
+            try:
+                insert_query = "INSERT INTO reminder (reminder, attachment, reminder_category, reminder_create_date, reminder_create_time, reminder_time, reminder_enabled) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                values = (reminder, attachment, reminder_category, reminder_create_date, reminder_create_time, reminder_time, reminder_enabled)
+                self.cursor.execute(insert_query, values)
+                self.db.commit()
+                break  # break out of the loop if no exception
+            except mysql.connector.IntegrityError as e:
+                if e.errno == 1062:  # Duplicate entry error code
+                    # Burada Kullanıcıya "Bu not başlıklı bir not alınmış gözüküyor, Bu notu değiştirmek ister misiniz?"
+                    # Tarzında soru yöneltilecek
+                    reminder += " *"  # add suffix
+                else:
+                    raise e
+        print(f"{self.cursor.rowcount} satır eklendi.")
+
+
 """
 note_add(self, note_title, note, note_create_date, note_category, note_time): Bu metot, veritabanına yeni bir not
     eklemek için kullanılır. note_title, note, note_create_date, note_category, ve note_time parametreleri ile 
