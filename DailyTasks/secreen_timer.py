@@ -51,7 +51,7 @@ def secreen_timer():
     fore_groundApp = ""
     temp_app = ""
     while True:
-        if len(Programs) == 3:
+        if len(Programs) == 4:
             break
         while True:
             print("Program İsimleri:", Programs, " - Ekran Zamanı ", Times, " - Counter: ", Day_Counter)
@@ -81,4 +81,4 @@ def secreen_timer():
         db.timer_into_database(program_id, Programs[x], '1', Times[x], Day_Counter[x])
 
 
-secreen_timer()
+# secreen_timer()

@@ -114,8 +114,6 @@ class Database:
         today_str = today.strftime('%Y-%m-%d')
         timer_update_query = f"Update secreen_timer SET secreen_time = secreen_time + {secreen_time}, day_counter = day_counter + {day_counter} where program_id = '{program_id}'"
 
-        self.cursor.execute(timer_update_query)
-        self.db.commit()
         try:
             self.cursor.execute(timer_update_query)
             self.db.commit()
@@ -130,7 +128,7 @@ class Database:
 
         data_today = self.timer_db_control()
 
-        if any(item[0] == program_id for item in data_today):
+        if any(item[1] == program_id for item in data_today):
             self.update_timer(program_id, time, date_counter)
             return
         else:
