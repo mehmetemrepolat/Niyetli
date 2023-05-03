@@ -40,9 +40,9 @@ class Database:
         while True:
             try:
                 cursor = self.db.cursor()
-                fastReminderQuery = "INSERT INTO reminder (reminder, attachment, reminder_category, reminder_create_date, reminder_create_time, reminder_time, reminder_enabled)" \
-                                    " VALUES (%s, %s, %s, %s, %s, %s, %s)"
-                values = (reminder, '', 'Fast Reminder', date.today().isoformat(), datetime.now().strftime("%H:%M:%S"), reminder_time, '1')
+                fastReminderQuery = "INSERT INTO reminder (reminder, attachment, reminder_category, reminder_create_date, reminder_create_time, reminder_date, reminder_time, reminder_enabled)" \
+                                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                values = (reminder, '', 'Fast Reminder', date.today().isoformat(), datetime.now().strftime("%H:%M:%S"), date.today().isoformat(), reminder_time, '1')
                 cursor.execute(fastReminderQuery, values)
                 self.db.commit()
                 cursor.close()
@@ -106,14 +106,30 @@ class Database:
 
         print(f"{self.cursor.rowcount} satır silindi.")
 
+    def get_today_reminders(self):
+        today = date.today()
+        today_str = today.strftime('%Y-%m-%d')
+        get_reminders_query = f"Select reminder_id, reminder_time, reminder, reminder_category From reminder WHERE reminder_date='{today_str}'"
+        mycursor = self.db.cursor()
+        mycursor.execute(get_reminders_query)
+        result = mycursor.fetchall()
+        result = [(row[0], row[1], row[2], row[3]) for row in result]
+        return result
+
+    def get_results(self, query):
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        return result
+
+
     def timer_db_control(self):
         today = date.today()
         today_str = today.strftime('%Y-%m-%d')
-        get_timer_query = f"Select * From secreen_timer where secreen_date='{today_str}'"
+        get_timer_query = f"Select * From secreen_timer WHERE secreen_date='{today_str}'"
         mycursor = self.db.cursor()
         mycursor.execute(get_timer_query)
         result = mycursor.fetchall()
-
         return result
 
 
