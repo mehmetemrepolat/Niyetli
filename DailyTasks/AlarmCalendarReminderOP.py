@@ -5,6 +5,7 @@ import win32con
 import sys
 import os
 import time
+from winotify import Notification
 
 class DateOperations:
 
@@ -23,10 +24,23 @@ class DateOperations:
     def get_date_only_number(self, date_input):
         return date_input.split()[1].replace(",", "")
 
+    @staticmethod
+    def show_balloon(not_title, not_msg):
+        cwd = os.getcwd()
+        icon_path = os.path.join(cwd, "Niyetli.ico")
+        toast = Notification(
+            app_id="Niyetli",
+            title=f"{not_title}",
+            msg=f"{not_msg}",
+            duration="long",
+            icon=icon_path
+        )
+        return toast.show()
 
-    def show_balloon(self, title, msg):
+    @staticmethod
+    def show_balloon2(self, title, msg):
         message_map = {
-            win32con.WM_DESTROY: OnDestroy,
+            win32con.WM_DESTROY: self.OnDestroy,
         }
         wc = WNDCLASS()
         hinst = wc.hInstance = GetModuleHandle(None)
@@ -46,8 +60,7 @@ class DateOperations:
         nid = (hwnd, 0, flags, win32con.WM_USER + 20, hicon, "tooltip")
         Shell_NotifyIcon(NIM_ADD, nid)
         Shell_NotifyIcon(NIM_MODIFY, (hwnd, 0, NIF_INFO, win32con.WM_USER + 20, hicon, "Balloon  tooltip", msg, 200, title))
-
-        time.sleep(10)
+        time.sleep(5)
         DestroyWindow(hwnd)
 
 
@@ -55,6 +68,7 @@ class DateOperations:
         nid = (hwnd, 0)
         Shell_NotifyIcon(NIM_DELETE, nid)
         PostQuitMessage(0)
+        return 0
 
 
 # show_balloon("Niyetli'den mesaj var!", "Hatalar düzeltildi, Performans iyileştirmeleri yapıldı, Kedi videolarıyla kalpler eridi.")
