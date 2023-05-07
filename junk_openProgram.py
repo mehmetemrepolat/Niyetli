@@ -18,12 +18,12 @@ def program_ac(dosya_yolu):
         return "Program açılırken bir hata oluştu."
 
 
-path = "C:/Users/Emre/Desktop/sosyal-guvenlik-4a-ise-giris-cikis-bildirgesi"
+path = "C:/Users/Emre/Desktop/Niyetli"
 
 
 
 
 
-program_ac(f"{path}")  # Internet Explorer açar
+program_ac(str(path))  # Internet Explorer açar
 
 #print(os.path.dirname(path))
