@@ -12,6 +12,15 @@ class Database:
         self.db = mysql.connector.connect(**self.config)
         self.cursor = self.db.cursor()
 
+    def get_results(self, query):
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        return result
+
+# >------------------------------------------------------------------------------------------------<
+# >-------------------------------------------   NOTES   ------------------------------------------<
+# >------------------------------------------------------------------------------------------------<
 
     def fast_note(self, note):
         if len(note) < 5:
@@ -32,37 +41,6 @@ class Database:
             except:
                 note_title += "*"
 
-    def fast_reminder(self, reminder):
-
-        now = datetime.now()
-        two_hours_later = now + timedelta(hours=2)
-        reminder_time = two_hours_later.strftime("%H:%M")
-        while True:
-            try:
-                cursor = self.db.cursor()
-                fastReminderQuery = "INSERT INTO reminder (reminder, attachment, reminder_category, reminder_create_date, reminder_create_time, reminder_date, reminder_time, reminder_enabled)" \
-                                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-                values = (reminder, '', 'Fast Reminder', date.today().isoformat(), datetime.now().strftime("%H:%M:%S"), date.today().isoformat(), reminder_time, '1')
-                cursor.execute(fastReminderQuery, values)
-                self.db.commit()
-                cursor.close()
-                print("Reminder added successfully.")
-                break
-            except:
-                print("Hata")
-
-    def get_last_category(self, column):
-        get_last_category_query = f"Select {column}_category FROM {column} ORDER BY {column}_id DESC LIMIT 1"
-        mycursor = self.db.cursor()
-        mycursor.execute(get_last_category_query)
-        myresult = mycursor.fetchone()
-        if myresult:
-            category = myresult[0]
-            return category
-        else:
-            print(f"Get last category error!")
-            return None
-
     def note_add(self, note_title, note, note_create_date, note_time, note_category=None):
         if note_category is None:
             note_category = self.get_last_category('note')
@@ -81,56 +59,6 @@ class Database:
                 else:
                     raise e
         print(f"{self.cursor.rowcount} satır eklendi.")
-
-
-    def get_category(self, note_title):
-        get_category_query = f"SELECT note_category FROM notes WHERE note_title = '{note_title}'"
-        mycursor = self.db.cursor()
-        mycursor.execute(get_category_query)
-        myresult = mycursor.fetchone()
-
-        if myresult:
-            category = myresult[0]
-            return category
-        else:
-            print(f"{note_title} adlı nota ait kategori bulunamadı.")
-            return None
-
-    def change_category(self, note_title, new_category):
-        change_query = f"UPDATE notes SET note_category = '{new_category}' WHERE note_title = {note_title}"
-
-    def delete_note(self, note_title):
-        delete_query = f"DELETE FROM notes WHERE note_id = {note_title}"
-        self.cursor.execute(delete_query)
-        self.db.commit()
-
-        print(f"{self.cursor.rowcount} satır silindi.")
-
-    def get_today_reminders(self):
-        today = date.today()
-        today_str = today.strftime('%Y-%m-%d')
-        get_reminders_query = f"Select reminder_id, reminder_time, reminder, reminder_category From reminder WHERE reminder_date='{today_str}'"
-        mycursor = self.db.cursor()
-        mycursor.execute(get_reminders_query)
-        result = mycursor.fetchall()
-        result = [(row[0], row[1], row[2], row[3]) for row in result]
-        return result
-
-    def get_results(self, query):
-        mycursor = self.db.cursor()
-        mycursor.execute(query)
-        result = mycursor.fetchall()
-        return result
-
-
-    def timer_db_control(self):
-        today = date.today()
-        today_str = today.strftime('%Y-%m-%d')
-        get_timer_query = f"Select * From secreen_timer WHERE secreen_date='{today_str}'"
-        mycursor = self.db.cursor()
-        mycursor.execute(get_timer_query)
-        result = mycursor.fetchall()
-        return result
 
 
     def update_note(self, note_id, note_title=None, note=None, note_create_date=None, note_category=None, note_time=None):
@@ -154,6 +82,144 @@ class Database:
         self.db.commit()
 
         print(f"{self.cursor.rowcount} satır güncellendi.")
+
+
+    def get_last_category(self, column):
+        get_last_category_query = f"Select {column}_category FROM {column} ORDER BY {column}_id DESC LIMIT 1"
+        mycursor = self.db.cursor()
+        mycursor.execute(get_last_category_query)
+        myresult = mycursor.fetchone()
+        if myresult:
+            category = myresult[0]
+            return category
+        else:
+            print(f"Get last category error!")
+            return None
+
+
+    def get_category(self, note_title):
+        get_category_query = f"SELECT note_category FROM notes WHERE note_title = '{note_title}'"
+        mycursor = self.db.cursor()
+        mycursor.execute(get_category_query)
+        myresult = mycursor.fetchone()
+
+        if myresult:
+            category = myresult[0]
+            return category
+        else:
+            print(f"{note_title} adlı nota ait kategori bulunamadı.")
+            return None
+
+    def change_category(self, note_title, new_category):
+        change_query = f"UPDATE notes SET note_category = '{new_category}' WHERE note_title = {note_title}"
+
+
+    def get_number_of_notes(self):
+        query = "SELECT COUNT(*) FROM notes;"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        myresult = mycursor.fetchall()
+        return int(myresult[0][0])
+
+    def show_notes(self, desc, content="*", number=0):
+
+        if content != "*":
+            query = f"SELECT {content} FROM notes ORDER BY note_id"
+        else:
+            query = "SELECT * FROM notes ORDER BY note_id"
+        if desc == 0:
+            query += " ASC"
+        else:
+            query += " DESC"
+        if number != 0:
+            query += f" LIMIT {number};"
+
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        return result
+
+
+
+
+
+
+    def delete_note(self, note_title):
+        delete_query = f"DELETE FROM notes WHERE note_id = {note_title}"
+        self.cursor.execute(delete_query)
+        self.db.commit()
+
+        print(f"{self.cursor.rowcount} satır silindi.")
+
+# >------------------------------------------------------------------------------------------------<
+# >------------------------------------------- REMINDER -------------------------------------------<
+# >------------------------------------------------------------------------------------------------<
+
+    def reminder_add(self, reminder, reminder_date, reminder_time, reminder_category='1', attachment='', reminder_enabled='1'):
+        if reminder_category == '1':
+            reminder_category = self.get_last_category('reminder')
+        while True:
+            try:
+                insert_query = "INSERT INTO reminder (reminder, attachment, reminder_category, reminder_create_date, reminder_create_time, reminder_date, reminder_time, reminder_enabled) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                values = (reminder, attachment, reminder_category, date.today().isoformat(), datetime.now().strftime("%H:%M:%S"), reminder_date, reminder_time, reminder_enabled)
+                self.cursor.execute(insert_query, values)
+                self.db.commit()
+                break
+            except mysql.connector.IntegrityError as e:
+                if e.errno == 1062:  # Duplicate entry error code
+                    # İleride burada Kullanıcıya "Bu not başlıklı bir not alınmış gözüküyor, Bu notu değiştirmek ister misiniz?"
+                    # Tarzında soru yöneltilecek
+                    reminder += " *"  # add suffix
+                else:
+                    raise e
+        print(f"{self.cursor.rowcount} satır eklendi.")
+
+    def fast_reminder(self, reminder):
+
+        now = datetime.now()
+        two_hours_later = now + timedelta(hours=2)
+        reminder_time = two_hours_later.strftime("%H:%M")
+        while True:
+            try:
+                cursor = self.db.cursor()
+                fastReminderQuery = "INSERT INTO reminder (reminder, attachment, reminder_category, reminder_create_date, reminder_create_time, reminder_date, reminder_time, reminder_enabled)" \
+                                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                values = (reminder, '', 'Fast Reminder', date.today().isoformat(), datetime.now().strftime("%H:%M:%S"), date.today().isoformat(), reminder_time, '1')
+                cursor.execute(fastReminderQuery, values)
+                self.db.commit()
+                cursor.close()
+                print("Reminder added successfully.")
+                break
+            except:
+                print("Hata")
+
+
+    def get_today_reminders(self):
+        today = date.today()
+        today_str = today.strftime('%Y-%m-%d')
+        get_reminders_query = f"Select reminder_id, reminder_time, reminder, reminder_category From reminder WHERE reminder_date='{today_str}'"
+        mycursor = self.db.cursor()
+        mycursor.execute(get_reminders_query)
+        result = mycursor.fetchall()
+        result = [(row[0], row[1], row[2], row[3]) for row in result]
+        return result
+
+
+
+# >------------------------------------------------------------------------------------------------<
+# >------------------------------------------- TIMER ----------------------------------------------<
+# >------------------------------------------------------------------------------------------------<
+
+
+    def timer_db_control(self):
+        today = date.today()
+        today_str = today.strftime('%Y-%m-%d')
+        get_timer_query = f"Select * From secreen_timer WHERE secreen_date='{today_str}'"
+        mycursor = self.db.cursor()
+        mycursor.execute(get_timer_query)
+        result = mycursor.fetchall()
+        return result
+
 
     def update_timer(self, program_id, secreen_time, day_counter):
         timer_update_query = f"Update secreen_timer SET secreen_time = secreen_time + {secreen_time}, day_counter = day_counter + {day_counter} where program_id = '{program_id}'"
@@ -187,24 +253,6 @@ class Database:
             return
 
 
-    def reminder_add(self, reminder, reminder_date, reminder_time, reminder_category='1', attachment='', reminder_enabled='1'):
-        if reminder_category == '1':
-            reminder_category = self.get_last_category('reminder')
-        while True:
-            try:
-                insert_query = "INSERT INTO reminder (reminder, attachment, reminder_category, reminder_create_date, reminder_create_time, reminder_date, reminder_time, reminder_enabled) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-                values = (reminder, attachment, reminder_category, date.today().isoformat(), datetime.now().strftime("%H:%M:%S"), reminder_date, reminder_time, reminder_enabled)
-                self.cursor.execute(insert_query, values)
-                self.db.commit()
-                break  # break out of the loop if no exception
-            except mysql.connector.IntegrityError as e:
-                if e.errno == 1062:  # Duplicate entry error code
-                    # Burada Kullanıcıya "Bu not başlıklı bir not alınmış gözüküyor, Bu notu değiştirmek ister misiniz?"
-                    # Tarzında soru yöneltilecek
-                    reminder += " *"  # add suffix
-                else:
-                    raise e
-        print(f"{self.cursor.rowcount} satır eklendi.")
 
 
 """
