@@ -186,24 +186,18 @@ def copy_or_transport_spesify_ext_files(_path, _dest_path, _spc_ext, method = Tr
 
 
 
-folder_path = ''
-dest_path = ''
-#copy_or_transport_spesify_ext_files(dest_path, folder_path, '.AAE', 0)
-
-
-#print(get_folder_ext_types(folder_path))
-
-#for x in range(0, len(os.listdir(folder_path))):
-#    #print(get_extension(os.listdir(folder_path)[x]))
-#    file_name = os.listdir(folder_path)[x]
-#    if get_extension(file_name) == '.PNG':
-#        print("")
-#        shutil.copy(f'{folder_path}/{file_name}', dest_path)
-#    else:
-#        pass
-#
-
-
+# folder_path = ''
+# dest_path = ''
+# copy_or_transport_spesify_ext_files(dest_path, folder_path, '.AAE', 0)
+# print(get_folder_ext_types(folder_path))
+# for x in range(0, len(os.listdir(folder_path))):
+#     #print(get_extension(os.listdir(folder_path)[x]))
+#     file_name = os.listdir(folder_path)[x]
+#     if get_extension(file_name) == '.PNG':
+#         print("")
+#         shutil.copy(f'{folder_path}/{file_name}', dest_path)
+#     else:
+#         pass
 # move_common_files('../Person1', '../Person2', '../Person3')
 # change_extension(input("File Path:"))
 # move_largest_files('Person2','Person1' , 15)
