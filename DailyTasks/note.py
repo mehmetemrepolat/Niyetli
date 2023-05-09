@@ -14,32 +14,24 @@ class Note:
     # Tutulan notların düzenli bir şekilde kaydının gerçekleşmesi gerekiyor.
     # Not kategorisi şeklinde notlar sınıflandırılabilir.
 
-
-
     def take_note(self, note, note_title, file_path="root", note_category="yellow", note_remind_time=None):
         today = datetime.today()
         today = today.strftime("%A, %B %d, %Y")
-
-
         if file_path == "root":
             f = open(f"{note_title}", "w")
         else:
             f = open(f"{file_path}/{note_title}.txt", "w")
-
         f.write(f"{note}")
-
         if note_remind_time is None:
             tomorrow = datetime.today() + timedelta(+1)
             note_remind_time = tomorrow
             f.write(f"\n{note_remind_time}\t")
         else:
             f.write(f"\n{note_remind_time}\t")
-
         f.close()
         Contents = open("NoteContents", "w")
         Contents.write(f"Bilgiler: noteId, {note_title}, {note}, {note_category}, {today}, {self.get_hour(self)}")
         Contents.close()
-
 
     def return_similar_notes(self, note):
         similar_notes = self.db.get_results(f"SELECT note, note_id FROM notes where note LIKE '{note}%'")
@@ -52,11 +44,8 @@ class Note:
             print(which_list)
             secim = input(f"'{note}' adında birden çok not mevcut, hangisini silmek istersiniz?")
             id_no = int(similar_list[int(secim)-1][1])
-            print("Deneme noktası, ", id_no)
             msg = similar_list[int(secim)-1][0]
-            print("Mesaj noktası", msg)
             sure = input(self.reminder.are_you_sure(msg, 'note'))
-
             if sure == '1':
                 return self.reminder.delete_sql(id_no, 'note', 'notes')
             else:
@@ -69,14 +58,22 @@ class Note:
             else:
                 return None
 
-
+    def last_or_first_x_note(self, number=5, last_first="first"):
+        query = "SELECT * FROM notes ORDER BY note_id "
+        if last_first == "first":
+            query += f"ASC LIMIT {number}"
+        elif last_first == "last":
+            query += f"DESC LIMIT {number}"
+        mycursor = self.db.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        result = [(row[2]) for row in result]
+        return result
 
 
 # notes = Note()
+# print(notes.last_or_first_x_note())
 # print(notes.get_result_similar(""))
-
-
-
 # def edit_note(note_id, about_edit, edit)
 # about_edit -> sil, düzenle, yeniden yaz, ekleme yap, çıkarma yap
 # def read_note(note_id)
