@@ -35,6 +35,9 @@ class Reminder:
         reminders_list = self.db.get_results(f"SELECT reminder, reminder_category, reminder_time FROM reminder WHERE reminder_date='{day}'")
         return reminders_list
 
+    def get_reminder_by_id(self, reminder_id):
+        reminder = self.db.get_results(f"Select reminder FROM reminder WHERE reminder_id = {reminder_id}")
+        return reminder[0][0]
 
     def which_one(self, similarreminders):  # read_reminders ta da bu özelliği kullanabilirim.
         set_list = []
@@ -44,9 +47,13 @@ class Reminder:
 
     def return_similar_reminders(self, reminder):
         similar_reminders = self.db.get_results(f"SELECT reminder, reminder_id FROM reminder where reminder LIKE '{reminder}%'")
-        list_reminders = []
         #return self.which_one(similar_reminders)
         return similar_reminders
+
+    def similar_reminders(self, reminder):
+        reminders = self.return_similar_reminders(reminder)
+        list = self.which_one(reminders)
+        return list
 
     def get_result_similar(self, reminder):
         similar_list = self.return_similar_reminders(reminder)
@@ -80,10 +87,32 @@ class Reminder:
         message = f"{self.db.cursor.rowcount} satır silindi."
         return message
 
+    def reminder_done(self, reminder_id, enabled=0):
+        update_query = ""
+        if enabled == 0:
+            update_query = f"UPDATE reminder SET reminder_enabled = '0' WHERE reminder_id = '{reminder_id}'"
+
+        elif enabled == 1:
+            update_query = f"UPDATE reminder SET reminder_enabled = '1' WHERE reminder_id = '{reminder_id}'"
+        else:
+            return "Anımsatıcı güncellenirken hata oluştu!"
+        self.db.cursor.execute(update_query)
+        self.db.db.commit()
+        reminder = self.get_reminder_by_id(reminder_id)
+        message = f"{reminder}, anımsatıcısı tamamlandı olarak işaretlendi"
+        if enabled == 0:
+            message = f"{reminder}, anımsatıcısı tamamlandı olarak işaretlendi"
+        elif enabled == 1:
+            message = f"{reminder}, anımsatıcısı tamamlanmadı olarak işaretlendi"
+        return message
 
 
-# rm = Reminder()
+
+rm = Reminder()
+
+# print(rm.get_reminder_by_id(116))
+# print(rm.reminder_done(109))
 # print(rm.read_reminders(date.today()))
-# print(rm.get_result_similar("msg"))
+# print(rm.similar_reminders("ana"))
 # rm.delete_sql(119, "reminder")
 
