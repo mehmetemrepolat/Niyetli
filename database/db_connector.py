@@ -112,7 +112,10 @@ class Database:
 
     def change_category(self, note_title, new_category):
         change_query = f"UPDATE notes SET note_category = '{new_category}' WHERE note_title = {note_title}"
-
+        mycursor = self.db.cursor()
+        mycursor.execute(change_query)
+        result = mycursor.fetchall()
+        return result
 
     def get_number_of_notes(self):
         query = "SELECT COUNT(*) FROM notes;"
