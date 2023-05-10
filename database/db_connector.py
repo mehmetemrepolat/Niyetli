@@ -5,7 +5,7 @@ class Database:
     def __init__(self):
         self.config = {
             'user': 'root',
-            'password': '*****',
+            'password': '413508',
             'host': 'localhost',
             'database': 'niyetli'
         }

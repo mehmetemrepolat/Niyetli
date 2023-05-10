@@ -70,20 +70,26 @@ class LocalNote:
         else:
             f.write(f"\n{note_remind_time}\t")
         f.close()
-        Contents = open("NoteContents", "w")
+        Contents = open("NoteContents.txt", "w")
         Contents.write(f"Bilgiler: noteId, {note_title}, {note}, {note_category}, {today}, {self.get_hour(self)}")
         Contents.close()
 
-
     def fast_note_local(self, note):
+        note_title = ""
         if len(note) < 10:
-            note_title = note
+            note_title = note  # Dosya Adı
         else:
-            note_title = " ".join(note.split()[:5])
-
+            note_title = " ".join(note.split()[:5])  # Dosya Adı
         file_path = "root"
+        f = open(f"{note_title}", "w")
+        f.write(f"{note}")
+        f.close()
+        Contents = open("NoteContents.txt", "a")  # NoteContents.txt adlı txt dosyasında loglar tutulacak
+        Contents.write(f"{self.today}, '{note_title}' - Fast Note\n")
+        Contents.close()
 
-
+# LN = LocalNote()
+# LN.fast_note_local("Deneme notu3")
 
 
 
