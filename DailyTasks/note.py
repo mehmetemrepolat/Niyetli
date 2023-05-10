@@ -14,25 +14,6 @@ class Note:
     # Tutulan notların düzenli bir şekilde kaydının gerçekleşmesi gerekiyor.
     # Not kategorisi şeklinde notlar sınıflandırılabilir.
 
-    def take_note(self, note, note_title, file_path="root", note_category="yellow", note_remind_time=None):
-        today = datetime.today()
-        today = today.strftime("%A, %B %d, %Y")
-        if file_path == "root":
-            f = open(f"{note_title}", "w")
-        else:
-            f = open(f"{file_path}/{note_title}.txt", "w")
-        f.write(f"{note}")
-        if note_remind_time is None:
-            tomorrow = datetime.today() + timedelta(+1)
-            note_remind_time = tomorrow
-            f.write(f"\n{note_remind_time}\t")
-        else:
-            f.write(f"\n{note_remind_time}\t")
-        f.close()
-        Contents = open("NoteContents", "w")
-        Contents.write(f"Bilgiler: noteId, {note_title}, {note}, {note_category}, {today}, {self.get_hour(self)}")
-        Contents.close()
-
     def return_similar_notes(self, note):
         similar_notes = self.db.get_results(f"SELECT note, note_id FROM notes where note LIKE '{note}%'")
         return similar_notes
@@ -69,6 +50,42 @@ class Note:
         result = mycursor.fetchall()
         result = [(row[2]) for row in result]
         return result
+
+
+class LocalNote:
+    today = datetime.today()
+    today = today.strftime("%A, %B %d, %Y")
+
+    def take_note(self, note, note_title, file_path="root", note_category="yellow", note_remind_time=None):
+
+        if file_path == "root":
+            f = open(f"{note_title}", "w")
+        else:
+            f = open(f"{file_path}/{note_title}.txt", "w")
+        f.write(f"{note}")
+        if note_remind_time is None:
+            tomorrow = datetime.today() + timedelta(+1)
+            note_remind_time = tomorrow
+            f.write(f"\n{note_remind_time}\t")
+        else:
+            f.write(f"\n{note_remind_time}\t")
+        f.close()
+        Contents = open("NoteContents", "w")
+        Contents.write(f"Bilgiler: noteId, {note_title}, {note}, {note_category}, {today}, {self.get_hour(self)}")
+        Contents.close()
+
+
+    def fast_note_local(self, note):
+        if len(note) < 10:
+            note_title = note
+        else:
+            note_title = " ".join(note.split()[:5])
+
+        file_path = "root"
+
+
+
+
 
 
 # notes = Note()
