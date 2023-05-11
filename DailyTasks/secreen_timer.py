@@ -3,7 +3,8 @@ import time as t
 import psutil
 import win32process
 from Niyetli.database.db_connector import Database
-from datetime import time, date, datetime
+from datetime import time, date, datetime, timedelta
+import datetime
 import hashlib
 
 db = Database()
@@ -46,6 +47,33 @@ def is_change_or_dont(before, after):
     else:
         return True
 
+# X Günlük Y sayıda istatistiği verebilme
+# X sayıda istatistiği verebilme
+# Genel manada kullanıcının ekran süresi istatistiklerini verebilme
+#
+def get_statistics(number_of_stat=None, first_last_stat="ASC", days_stat=7):  # Son bir haftalık kayıtları versin
+    today = datetime.date.today()
+    asked_date = today + timedelta(-days_stat)
+    asked_date = asked_date.strftime("%Y-%m-%d")
+    query = f"SELECT program_name, secreen_time, secreen_date, day_counter FROM secreen_timer WHERE secreen_date >= '{asked_date}'"
+    if number_of_stat is not None:
+        query += f" LIMIT {number_of_stat}"
+    data = db.get_results(query)
+    counts = {}
+    for item in data:
+        if item[0] in counts:
+            counts[item[0]] += int(item[1])
+        else:
+            counts[item[0]] = int(item[1])
+    result = {}
+    for item in data:
+        if item[0] in counts:
+            if item[0] not in result:
+                result[item[0]] = {'count': counts[item[0]],'time': 0}
+            result[item[0]]['time'] += int(item[3])
+    return result
+    # SELECT * FROM secreen_timer WHERE secreen_date >= '2023-05-01'
+
 
 def secreen_timer():
     fore_groundApp = ""
@@ -82,3 +110,4 @@ def secreen_timer():
 
 
 # secreen_timer()
+print(get_statistics())
