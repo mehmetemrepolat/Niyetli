@@ -1,30 +1,16 @@
-# Burada arama motoru ile arama yapabilme yer alacak.
-# Arama motorundan(bazı spesifik aramalar için) bilgiler çekilip kullanıcıya okunması sağlanacak.
-import time
-import webbrowser
-import pyperclip as pc
+import requests
+from bs4 import BeautifulSoup
 
-from Niyetli.database.db_connector import Database
+# Google araması yap
+query = "kocaeli"
+url = f"https://www.google.com/search?q={query}"
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"}
+page = requests.get(url, headers=headers)
+soup = BeautifulSoup(page.content, "html.parser")
+results = soup.find_all("div", class_="g")[:10]
 
-
-def get_engine():
-    db = Database()
-    print("Adana")
-    engine_preference = db.get_results("Select search_engine FROM user_preferences")
-    print(engine_preference[0][0])
-    return engine_preference[0][0]
-# duckduckgo.com/?q=deneme
-# www.bing.com/search?q=deneme
-# www.google.com/search?q={search}
-def search(search):
-    url = f"www.google.com/search?q={search}"
-    webbrowser.get().open_new_tab(url)
-
-def copy_to_search():
-    coppied_text = pc.paste()
-    search_url = f"www.google.com/search?q={coppied_text}"
-    return webbrowser.get().open_new_tab(search_url)
-
-
-print(copy_to_search())
-#search("Anan")
+# Sonuçları listele
+for idx, result in enumerate(results, start=1):
+    link = result.find("a")["href"]
+    title = result.find("a").find("h3").get_text() if result.find("a").find("h3") else result.find("a").get_text()
+    print(f"{idx} - {title} - ({link})")
