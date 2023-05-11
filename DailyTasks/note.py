@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta, time
+import pyperclip as pc
 from Niyetli.database.db_connector import Database
 from Niyetli.DailyTasks.reminder import Reminder
 class Note:
@@ -22,7 +23,6 @@ class Note:
         similar_list = self.return_similar_notes(note)
         if len(similar_list) > 1:
             which_list = self.reminder.which_one(similar_list)
-            print(which_list)
             secim = input(f"'{note}' adında birden çok not mevcut, hangisini silmek istersiniz?")
             id_no = int(similar_list[int(secim)-1][1])
             msg = similar_list[int(secim)-1][0]
@@ -51,6 +51,30 @@ class Note:
         result = [(row[2]) for row in result]
         return result
 
+    def copy_to_note(self):
+        coppied_note = pc.paste()
+        if coppied_note != "":
+            if len(coppied_note) < 5:
+                note_title = coppied_note
+            else:
+                note_title = " ".join(coppied_note.split()[:5])
+
+            while True:
+                try:
+                    cursor = self.db.db.cursor()
+                    insert_query = "INSERT INTO notes (note_title, note, note_category, note_create_date, note_time) VALUES (%s, %s, %s, %s, %s)"
+                    values = (note_title, coppied_note, 'Panel Note', date.today().isoformat(), datetime.now().strftime("%H:%M:%S"))
+                    cursor.execute(insert_query, values)
+                    self.db.db.commit()
+                    cursor.close()
+                    print("Note added")
+                    break
+                except:
+                    note_title += "*"
+        else:
+            return None
+
+
 
 class LocalNote:
     today = datetime.today()
@@ -74,6 +98,22 @@ class LocalNote:
         Contents.write(f"Bilgiler: noteId, {note_title}, {note}, {note_category}, {today}, {self.get_hour(self)}")
         Contents.close()
 
+    def coppy_to_localNotes(self):
+        note = pyperclip.paste()
+        note_title = ""
+        if len(str(note)) < 10:
+            note_title = note  # Dosya Adı
+        else:
+            note_title = " ".join(str(note).split()[:5])  # Dosya Adı
+        file_path = "root"
+        f = open(f"{note_title}.txt", "w")
+        f.write(f"{note}")
+        f.close()
+        Contents = open("NoteContents.txt", "a")  # NoteContents.txt adlı txt dosyasında loglar tutulacak
+        Contents.write(f"{self.today}, '{note_title}' - Panel Note\n")
+        Contents.close()
+
+
     def fast_note_local(self, note):
         note_title = ""
         if len(note) < 10:
@@ -90,11 +130,9 @@ class LocalNote:
 
 # LN = LocalNote()
 # LN.fast_note_local("Deneme notu3")
-
-
-
-
+# LN.coppy_to_localNotes()
 # notes = Note()
+# notes.copy_to_note()
 # print(notes.last_or_first_x_note())
 # print(notes.get_result_similar(""))
 # def edit_note(note_id, about_edit, edit)
