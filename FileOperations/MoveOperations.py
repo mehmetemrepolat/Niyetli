@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 
 def rename_files(folder_path):
+    new_filename = ""
     i = 1
     for filename in os.listdir(folder_path):
         if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".png"):
@@ -47,7 +48,7 @@ def change_extension(folder_path, old_extension, new_extension):
                 os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
 
 
-def move_largest_files(src_folder, dst_folder, top_n):
+def move_largest_files(src_folder, dst_folder, top_n):  # top_n == taşınacak dosya sayısı
     files = [(os.path.join(src_folder, file), os.path.getsize(os.path.join(src_folder, file))) for file in os.listdir(src_folder)]
     largest_files = heapq.nlargest(top_n, files, key=lambda file: file[1])
     for file in largest_files:
@@ -89,18 +90,18 @@ def move_random_files(src_folder, dst_folder, num_files, file_extension=None):
     file_extension: The extension of files that will be moved.
     """
     if not os.path.exists(src_folder):
-        raise ValueError(f"Source folder {src_folder} does not exist.")
+        raise ValueError(f"Kaynak klasör mevcut değil.")
     if not os.path.exists(dst_folder):
-        raise ValueError(f"Destination folder {dst_folder} does not exist.")
+        raise ValueError(f"Hedef klasör mevcut değil.")
     if not os.path.isdir(src_folder):
-        raise ValueError(f"{src_folder} is not a folder.")
+        raise ValueError(f"{src_folder} bir klasör değil.")
     if not os.path.isdir(dst_folder):
-        raise ValueError(f"{dst_folder} is not a folder.")
+        raise ValueError(f"{dst_folder} bir klasör değil.")
     if num_files <= 0:
-        raise ValueError(f"num_files({num_files}) can't be less than 1.")
+        raise ValueError(f"Taşınacak dosya sayısı({num_files}) 1'den az olamaz.")
     files = [f for f in os.listdir(src_folder) if os.path.isfile(os.path.join(src_folder, f)) and (file_extension is None or f.endswith(file_extension))]
     if num_files > len(files):
-        raise ValueError(f"num_files({num_files}) can't be greater than number of files({len(files)}).")
+        raise ValueError(f"Taşınacak dosya sayısı({num_files}), kaynak klasöründeki dosya sayısından({len(files)}) fazla olamaz.")
     selected_files = random.sample(files, num_files)
 
     for file in selected_files:

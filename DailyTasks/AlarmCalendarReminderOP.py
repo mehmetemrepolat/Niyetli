@@ -72,7 +72,7 @@ class DateOperations:
 
 
 # show_balloon("Niyetli'den mesaj var!", "Hatalar düzeltildi, Performans iyileştirmeleri yapıldı, Kedi videolarıyla kalpler eridi.")
-# today = datetime.today()
+    # today = datetime.today()
 # tomorrow = datetime.today()+timedelta(+1)
 # print(datetime.now().strftime("%H:%M"))
 # print(today.strftime("%A, %B %d, %Y"))
