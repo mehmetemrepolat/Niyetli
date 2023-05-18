@@ -16,8 +16,8 @@ class WindowsOsControl:
         return os.system(f"shutdown /s /t {t}")
 
     @staticmethod
-    def sleep_system(t=10):
-        return os.system(f"shutdown /h /t {t}")
+    def sleep_system():
+        return os.system(f"shutdown /h")
 
     @staticmethod
     def restart_system(t=10):
@@ -59,7 +59,7 @@ class MediaControl:
         ctypes.windll.user32.keybd_event(0xB1, 0, 0, 0)  # Backward tuşu
         ctypes.windll.user32.keybd_event(0xB1, 0, 0x0002, 0)
 
-#set_volume(50)
+# set_volume(50)
 # next_media()
 # play_pause_media()
 # previous_media()
