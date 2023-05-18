@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="niyetlilogo">
+    <file>Img/Niyetli_1.png</file>
+  </qresource>
+</RCC>
