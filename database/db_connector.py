@@ -124,6 +124,14 @@ class Database:
         myresult = mycursor.fetchall()
         return int(myresult[0][0])
 
+    def show_onlyNotes(self):
+        query = "SELECT note FROM notes ORDER BY note_id"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        result = [(row[0]) for row in result]
+        return result
+
     def show_notes(self, desc, content="*", number=0):
 
         if content != "*":
