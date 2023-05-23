@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>559</width>
+    <width>839</width>
     <height>681</height>
    </rect>
   </property>
@@ -23,8 +23,8 @@
    <widget class="QFrame" name="frame_29">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>60</y>
+      <x>590</x>
+      <y>70</y>
       <width>120</width>
       <height>120</height>
      </rect>
@@ -85,8 +85,8 @@ background-color:rgb(0, 18, 25);</string>
    <widget class="QFrame" name="container_7">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>80</y>
+      <x>440</x>
+      <y>90</y>
       <width>201</width>
       <height>81</height>
      </rect>
@@ -176,8 +176,8 @@ background-color:rgb(0, 18, 25);</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>160</y>
+      <x>430</x>
+      <y>170</y>
       <width>281</width>
       <height>461</height>
      </rect>
@@ -205,19 +205,10 @@ background-color:rgb(0, 18, 25);</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QListView" name="Dialog_2">
-        <property name="font">
-         <font>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
+       <widget class="QTableWidget" name="tableWidget">
         <property name="styleSheet">
-         <string notr="true">background-color:rgb(0, 18, 25);
+         <string notr="true">background: rgb(0, 18, 25);
+background-color:rgb(0, 18, 25);
 color: #bfbfbf; /* Yazı rengi*/
 border: none;
 font: arial</string>
@@ -286,8 +277,8 @@ font-weight: bold;</string>
    <widget class="QFrame" name="frame_32">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>70</y>
+      <x>430</x>
+      <y>80</y>
       <width>51</width>
       <height>51</height>
      </rect>
@@ -327,10 +318,177 @@ font-weight: bold;</string>
      </layout>
     </widget>
    </widget>
+   <widget class="QFrame" name="container_content">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>170</y>
+      <width>281</width>
+      <height>461</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame{
+	background-color:rgb(0, 18, 25);
+    border-radius: 30px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QWidget" name="verticalLayoutWidget_6">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>100</y>
+       <width>241</width>
+       <height>341</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QLabel" name="data_input">
+        <property name="text">
+         <string>data</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_7">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>10</y>
+       <width>231</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_7">
+      <item>
+       <widget class="QLabel" name="content_title">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>-1</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #fff;
+border: none;
+font-family: Arial;
+font-size: 18px;
+font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>Başlık</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_8">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>80</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_8">
+      <item>
+       <widget class="QLabel" name="time_data">
+        <property name="font">
+         <font>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: white</string>
+        </property>
+        <property name="text">
+         <string>Tarih/Zaman</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_9">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>80</y>
+       <width>111</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_10">
+      <item>
+       <widget class="QLabel" name="content_category">
+        <property name="styleSheet">
+         <string notr="true">color: white</string>
+        </property>
+        <property name="text">
+         <string>Kategori</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="closebtn">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>0</y>
+       <width>20</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="toolTip">
+      <string>Close</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+	font: 8pt &quot;Comic Sans MS&quot;;
+	border: none;
+	border-radius: 10px;		
+	background-color: #ca1606;
+
+	font: 25 8pt &quot;Microsoft YaHei UI Light&quot;;
+    color: #fff;
+}
+QPushButton:hover {		
+	background-color: rgb(255, 0, 0);
+}</string>
+     </property>
+     <property name="text">
+      <string>x</string>
+     </property>
+    </widget>
+   </widget>
    <zorder>frame_32</zorder>
    <zorder>container_7</zorder>
    <zorder>frame_29</zorder>
    <zorder>container_history</zorder>
+   <zorder>container_content</zorder>
   </widget>
   <action name="actionAyarlar">
    <property name="text">

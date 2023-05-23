@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QFrame, QListView, QLineEdit, QPushButton, QCommandLinkButton, QFileDialog, QMenuBar, QMenu, QStatusBar, QTextBrowser, QTextEdit
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QFrame, QToolTip, QHeaderView, QTableWidgetItem, QListView, QLineEdit, QPushButton, QCommandLinkButton, QFileDialog, QMenuBar, QMenu, QStatusBar, QTextBrowser, QTextEdit
 from PyQt5 import uic, QtCore
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap, QResizeEvent
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap, QResizeEvent, QCursor
 from PyQt5.QtCore import QThread, pyqtSignal, Qt, QFile, QPoint
 from PyQt5.QtWidgets import QGroupBox
+from PyQt5.QtWidgets import QTableWidget
 
 from database.db_connector import Database
 import sys
@@ -11,9 +12,10 @@ class WorkerThread(QThread):
     dialogAdded = pyqtSignal(str)
 
     def run(self):
-        while True:
-            text = input("Eklemek istediğiniz yazıyı girin: ")
-            self.dialogAdded.emit(text)
+        pass
+        # while True:
+            # text = input("Eklemek istediğiniz yazıyı girin: ")
+            # self.dialogAdded.emit(text)
 
 
 class command_com_ui(QMainWindow):
@@ -73,10 +75,12 @@ class UI(QMainWindow):
         super(UI, self).__init__()
         uic.loadUi("Niyetli.ui", self)
         self.label = self.findChild(QLabel, "label")
-        self.dialogList = self.findChild(QListView, "Dialog_2")
+        # self.dialogList = self.findChild(QListView, "Dialog_2")
         self.niyetli_logo = self.findChild(QLabel, "logo")
         self.hide_show = self.findChild(QPushButton, "niyetli_buton")
         self.container_history = self.findChild(QFrame, "container_history")
+        self.container_Content = self.findChild(QFrame, "container_content")
+
         # self.container_history.setStyleSheet("background-color: rgb(0, 18, 25, 0.8); border-radius: 30px;")
         # self.container_history.setWindowOpacity(0.8)
         self.niyetli_status = self.findChild(QFrame, "frame_32")
@@ -102,29 +106,102 @@ class UI(QMainWindow):
         self.niyetli_logo.setAlignment(Qt.AlignJustify)  # Resmi ortalama
 
         model = QStandardItemModel()
-        self.values = ["anan", "anan2"]
+        self.commands = ["anan", "anan2"]
         self.notlar = ["not1", "not2"]
         self.animsat = ["2"]
-        self.current_category = "values"  # Başlangıçta gösterilecek kategori
+        self.current_category = "commands"  # Başlangıçta gösterilecek kategori
 
-        for i in self.values:
-            item = QStandardItem(i)
-            model.appendRow(item)
+        self.QTable = self.findChild(QTableWidget, "tableWidget")
+        self.tableWidget.setColumnCount(3)
 
-        self.dialogList.setModel(model)
+        tableWidget = self.findChild(QTableWidget, "tableWidget")
+        tableWidget.setRowCount(len(self.commands))
+        tableWidget.setColumnCount(len(self.commands[0]))
 
+        # QTableWidget'ın başlık widget'ını al
+        header = self.tableWidget.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+
+        header_style = "QHeaderView::section { background-color: <renk>; opacity: <opaklık>; border: none;  padding-left: 5px; }"
+
+        # Arka plan rengini ve opaklık değerini istediğiniz şekilde değiştirin
+        header_style = header_style.replace("<renk>", "rgb(0, 18, 25)")
+        header_style = header_style.replace("<opaklık>", "0.5")
+        self.tableWidget.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
+        # Stil yapısını uygula
+        header.setStyleSheet(header_style)
+
+        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.horizontalHeader().setVisible(False)
+        self.container_content.setVisible(False)
+
+        #for row, rowData in enumerate(self.values):
+        #    item = QTableWidgetItem(str(rowData))
+        #    tableWidget.setItem(row, item)
+
+        # for i in self.values:
+        #     item = QStandardItem(i)
+        #     model.appendRow(item)
+
+        # self.dialogList.setModel(model)
+        self.tableWidget.cellEntered.connect(self.show_cell_tooltip)
+        # self.tableWidget.setToolTip("Anan")
         self.show()
 
         self.workerThread = WorkerThread()
         self.workerThread.dialogAdded.connect(self.addDialog)
         self.workerThread.start()
         # self.openSecondUI()
+        self.tableWidget.cellDoubleClicked.connect(self.cell_clicked)
+
+    def show_cell_tooltip(self, row, column):
+        item = self.tableWidget.item(row, column)
+        if item is not None:
+            tooltip_text = item.text()
+            self.tableWidget.setToolTip(tooltip_text)
+        else:
+            self.tableWidget.setToolTip("")
+
+    def cell_clicked(self, row, column):
+        self.container_content.setVisible(True)
+        item = self.tableWidget.item(row, column)
+        if item is not None:
+            value = item.text()
+            # print(value, " ", self.current_category)
+            self.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.set_containerContent(value)
+
+    def set_containerContent(self, title, content_type=0):
+        contents = self.db.get_note_content(str(title))
+        # print(contents)
+        container_Title = self.findChild(QLabel, "content_title")
+        content_Category = self.findChild(QLabel, "content_category")
+        content_time = self.findChild(QLabel, "time_data")
+        content_title2 = contents[0][1]
+        content_time2 = f"{contents[0][4]} {contents[0][5]}"
+        content_categ2 = contents[0][3]
+
+
+        container_Title.setText(content_title2)
+        content_Category.setText(content_categ2)
+        content_time.setText(content_time2)
+
+        #content_Category.setText(content_categ2)
+        #content_time.setText(content_time2)
+        ##content_Time = contents
+
+        #container_Title.setText("content_title")
+        #content_Category.setText("content_categ")
+        #self.content_time.setText(f"{contents[4]} - {contents[5]}")
+
+        #self.container_Title.setText(contents[1])
+
+
 
     def change_categoryList(self):
-        model = self.dialogList.model()
         label = self.findChild(QLabel, "category_title")
 
-        if self.current_category == "values":
+        if self.current_category == "commands":
             label.setText("Notlar")
             notes = self.db.show_onlyNotes()
             data = notes
@@ -137,13 +214,21 @@ class UI(QMainWindow):
 
         else:
             label.setText("Komut Geçmişi")
-            data = self.values
-            self.current_category = "values"
-        model.clear()
+            data = self.commands
+            self.current_category = "commands"
 
-        for i in data:
-            item = QStandardItem(i)
-            model.appendRow(item)
+        tableWidget = self.findChild(QTableWidget, "tableWidget")
+        tableWidget.clearContents()  # Tablonun içeriğini temizle
+        tableWidget.setRowCount(len(data))  # Satır sayısını güncelle
+        tableWidget.setColumnCount(1)  # Sadece bir sütun olduğunu belirt
+
+        #for row, rowData in enumerate(data):
+        #    for col, value in enumerate(rowData):
+        #        item = QTableWidgetItem(str(value))
+        #        tableWidget.setItem(row, col, item)
+        for row, value in enumerate(data):
+            item = QTableWidgetItem(str(value))  # Değeri doğrudan al
+            tableWidget.setItem(row, 0, item)
 
 
     def mousePressEvent(self, event):
@@ -154,19 +239,19 @@ class UI(QMainWindow):
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = event.globalPos()
 
-    #def resizeEvent(self, event: QResizeEvent):
-    #    super().resizeEvent(event)
-    #    self.adjustImageSize()
+    # def resizeEvent(self, event: QResizeEvent):
+    #     super().resizeEvent(event)
+    #     self.adjustImageSize()
 
-    #def adjustImageSize(self):
-    #    scaledPixmap = self.pixmap.scaled(self.niyetli_logo.size(), Qt.KeepAspectRatio)
-    #    self.niyetli_logo.setPixmap(scaledPixmap)
+    # def adjustImageSize(self):
+    #     scaledPixmap = self.pixmap.scaled(self.niyetli_logo.size(), Qt.KeepAspectRatio)
+    #     self.niyetli_logo.setPixmap(scaledPixmap)
 
     def addToValues(self, command_text=None):
         text = command_text
         model = self.dialogList.model()
         item = QStandardItem(text)
-        self.values.append(command_text)
+        self.commands.append(command_text)
         model.insertRow(0, item)
         # self.command.clear()
 
@@ -194,7 +279,7 @@ class UI(QMainWindow):
         self.command_window = command_com_ui(self)
         if command_window.isHidden():
             self.openCommandUI()
-            #self.niyetli_status.setStyleSheet("")
+            # self.niyetli_status.setStyleSheet("")
 
         else:
             self.closeCommandUI()

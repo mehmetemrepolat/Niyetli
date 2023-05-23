@@ -125,11 +125,18 @@ class Database:
         return int(myresult[0][0])
 
     def show_onlyNotes(self):
-        query = "SELECT note FROM notes ORDER BY note_id"
+        query = "SELECT note_title, note FROM notes ORDER BY note_id"
         mycursor = self.db.cursor()
         mycursor.execute(query)
         result = mycursor.fetchall()
         result = [(row[0]) for row in result]
+        return result
+
+    def get_note_content(self, note):
+        query = f"SELECT * FROM notes WHERE note_title = '{note}'"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
         return result
 
     def show_notes(self, desc, content="*", number=0):
@@ -165,6 +172,14 @@ class Database:
 # >------------------------------------------------------------------------------------------------<
 # >------------------------------------------- REMINDER -------------------------------------------<
 # >------------------------------------------------------------------------------------------------<
+
+    def get_reminders(self):
+        query = "SELECT  FROM notes ORDER BY note_id"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        result = [(row[0], row[1]) for row in result]
+        return result
 
     def reminder_add(self, reminder, reminder_date, reminder_time, reminder_category='1', attachment='', reminder_enabled='1'):
         if reminder_category == '1':
@@ -265,7 +280,8 @@ class Database:
 
 
 
-
+deneme = Database()
+print(deneme.get_note_content("1 2 anan das al sk  5"))
 """
 note_add(self, note_title, note, note_create_date, note_category, note_time): Bu metot, veritabanına yeni bir not
     eklemek için kullanılır. note_title, note, note_create_date, note_category, ve note_time parametreleri ile 
