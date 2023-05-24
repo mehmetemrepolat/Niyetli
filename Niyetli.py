@@ -4,7 +4,6 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap, QResizeEvent
 from PyQt5.QtCore import QThread, pyqtSignal, Qt, QFile, QPoint
 from PyQt5.QtWidgets import QGroupBox
 from PyQt5.QtWidgets import QTableWidget
-
 from database.db_connector import Database
 import sys
 
@@ -124,10 +123,16 @@ class UI(QMainWindow):
 
         header_style = "QHeaderView::section { background-color: <renk>; opacity: <opaklık>; border: none;  padding-left: 5px; }"
 
+        self.hideContainerHistory = self.findChild(QPushButton, "closebtn")
+
+        self.hideContainerHistory.clicked.connect(self.hide_ContainerHistory)
+
+
         # Arka plan rengini ve opaklık değerini istediğiniz şekilde değiştirin
         header_style = header_style.replace("<renk>", "rgb(0, 18, 25)")
         header_style = header_style.replace("<opaklık>", "0.5")
         self.tableWidget.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
+        self.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         # Stil yapısını uygula
         header.setStyleSheet(header_style)
 
@@ -154,6 +159,9 @@ class UI(QMainWindow):
         # self.openSecondUI()
         self.tableWidget.cellDoubleClicked.connect(self.cell_clicked)
 
+    def hide_ContainerHistory(self):
+        self.container_content.setVisible(False)
+
     def show_cell_tooltip(self, row, column):
         item = self.tableWidget.item(row, column)
         if item is not None:
@@ -163,25 +171,32 @@ class UI(QMainWindow):
             self.tableWidget.setToolTip("")
 
     def cell_clicked(self, row, column):
-        self.container_content.setVisible(True)
-        item = self.tableWidget.item(row, column)
-        if item is not None:
-            value = item.text()
-            # print(value, " ", self.current_category)
-            self.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.set_containerContent(value)
+        if self.current_category == "notlar":
+            self.container_content.setVisible(True)
+            item = self.tableWidget.item(row, column)
+            if item is not None:
+                value = item.text()
+                # print(value, " ", self.current_category)
+                self.set_containerNoteContent(value)
+        elif self.current_category == "animsaticilar":
+            print("Anan")
+        else:
+            print("Anana")
 
-    def set_containerContent(self, title, content_type=0):
+    def set_containerNoteContent(self, title, content_type=0):
         contents = self.db.get_note_content(str(title))
         # print(contents)
         container_Title = self.findChild(QLabel, "content_title")
         content_Category = self.findChild(QLabel, "content_category")
+        content_Note = self.findChild(QLabel, "data_input")
         content_time = self.findChild(QLabel, "time_data")
         content_title2 = contents[0][1]
+
         content_time2 = f"{contents[0][4]} {contents[0][5]}"
         content_categ2 = contents[0][3]
+        content_Note2 = contents[0][2]
 
-
+        content_Note.setText(content_Note2)
         container_Title.setText(content_title2)
         content_Category.setText(content_categ2)
         content_time.setText(content_time2)
