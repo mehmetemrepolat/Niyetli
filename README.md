@@ -1,6 +1,5 @@
 # Versiyon 1.0
 
-- Proje arka planda çalışıyor mu?
 - Birebir konuşabilme, sohbet edebilme
 - Gündelik işlemleri halledebilme
   - Saat
