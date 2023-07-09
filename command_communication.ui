@@ -109,7 +109,7 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>371</width>
+         <width>411</width>
          <height>31</height>
         </rect>
        </property>
@@ -141,9 +141,9 @@ font-weight: bold;</string>
     <widget class="QFrame" name="aa">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>140</y>
-       <width>371</width>
+       <width>361</width>
        <height>41</height>
       </rect>
      </property>
@@ -160,23 +160,6 @@ background-color: rgb(255, 255, 255);
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <widget class="QLineEdit" name="a_input">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>6</y>
-        <width>351</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">#a_input{
-border-radius: 18px;
-border:2px solid #fff;
-font: 25 14pt &quot;Bahnschrift Light&quot;;
-}</string>
-      </property>
-     </widget>
     </widget>
     <widget class="QPushButton" name="closebtn">
      <property name="enabled">
@@ -212,6 +195,23 @@ QPushButton:hover {
      </property>
      <property name="text">
       <string>x</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="a_input">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>100</y>
+       <width>351</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">#a_input{
+border-radius: 18px;
+border:2px solid #fff;
+font: 25 14pt &quot;Bahnschrift Light&quot;;
+}</string>
      </property>
     </widget>
    </widget>
