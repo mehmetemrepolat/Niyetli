@@ -1,0 +1,52 @@
+
+1-) Aşağıda ana durum mevcut:
+------------------------------------------------------------------------------------------------------
+
+            Sesli Notlar:
+
+	▶   Sesli Not Başlığı 1
+	▶   Sesli Not Başlığı 2
+
+
+2-) "Sesli Not Başlığı 1" Play tuşuna basıldığı vakit
+------------------------------------------------------------------------------------------------------
+
+            Sesli Notlar:
+
+
+	⏸️   Sesli Not Başlığı 1
+	▶   Sesli Not Başlığı 2
+
+Yukarıdaki durumda "Sesli Not Başlığı 1" adlı sesli not çalmaktadır.
+
+
+3-) "Sesli Not Başlığı 1" sesli notu süresi bittiğinde
+	olması gereken durum:
+------------------------------------------------------------------------------------------------------
+
+            Sesli Notlar:
+
+
+	▶   Sesli Not Başlığı 1
+	▶   Sesli Not Başlığı 2
+
+Yukarıdaki durum 1. durumun tekrarı konumundadır. Asıl önemli durumlar
+ aşağıdaki durumlar olacaktır.
+
+
+4-) "Sesli Not Başlığı 1" sesli not çalma işlemine devam ederken,
+	kullanıcı:
+
+	I->
+	"⏸️Sesli Not Başlığı 1"
+	buradaki pause(⏸️) tuşuna bastığında, durum 1'e tekrar geri
+		dönülmesi gerekmetedir.
+	II->
+	"▶   Sesli Not Başlığı 2"
+	buradaki play(▶) tuşuna bastığında, anlık olarak durum 1'e
+		geri dönüp, daha sonra
+		aşağıdaki durumun gerçekleşmesi gerekmektedir:
+
+		▶   Sesli Not Başlığı 1
+		⏸️   Sesli Not Başlığı 2
+

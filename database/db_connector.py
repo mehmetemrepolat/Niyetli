@@ -110,6 +110,19 @@ class Database:
             print(f"{note_title} adlı nota ait kategori bulunamadı.")
             return None
 
+    def get_sound_from_db(self, voice_note_title):
+        query = f"SELECT voice_note_path FROM voice_notes WHERE voice_note_title='{voice_note_title}'"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        myresult = mycursor.fetchone()
+        if myresult:
+            note_path = myresult[0]
+            return note_path
+        else:
+            print(f"{voice_note_title} adlı sesli not bulunamadı.")
+            return None
+
+
     def change_category(self, note_title, new_category):
         change_query = f"UPDATE notes SET note_category = '{new_category}' WHERE note_title = {note_title}"
         mycursor = self.db.cursor()
@@ -131,6 +144,17 @@ class Database:
         result = mycursor.fetchall()
         result = [(row[0]) for row in result]
         return result
+
+
+    def show_voiceNotes(self):
+        query = "SELECT voice_note_title, voice_note_path, voice_note_categories From voice_notes"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        result = [(row[0]) for row in result]
+        return result
+
+
 
     def get_note_content(self, note):
         query = f"SELECT * FROM notes WHERE note_title = '{note}'"

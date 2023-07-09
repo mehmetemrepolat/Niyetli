@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>581</height>
+    <width>1001</width>
+    <height>1041</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -198,9 +198,9 @@ background-color:rgb(0, 18, 25);</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>70</y>
+       <y>110</y>
        <width>241</width>
-       <height>371</height>
+       <height>331</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -220,9 +220,9 @@ font: arial</string>
     <widget class="QWidget" name="verticalLayoutWidget_3">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>10</y>
-       <width>171</width>
+       <x>60</x>
+       <y>20</y>
+       <width>161</width>
        <height>41</height>
       </rect>
      </property>
@@ -254,18 +254,70 @@ font-weight: bold;</string>
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="verticalLayoutWidget_5">
+    <widget class="QWidget" name="verticalLayoutWidget_13">
      <property name="geometry">
       <rect>
-       <x>210</x>
-       <y>10</y>
-       <width>174</width>
-       <height>42</height>
+       <x>20</x>
+       <y>20</y>
+       <width>43</width>
+       <height>41</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="backLayout">
       <item>
-       <widget class="QCommandLinkButton" name="change_category">
+       <widget class="QPushButton" name="back_button">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_15">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>20</y>
+       <width>43</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="next_buttonLayout">
+      <item>
+       <widget class="QPushButton" name="next_button">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QLineEdit" name="search">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>70</y>
+       <width>201</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: #fff;
+</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_14">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>43</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_15">
+      <item>
+       <widget class="QPushButton" name="search_button">
         <property name="text">
          <string/>
         </property>
@@ -297,7 +349,7 @@ font-weight: bold;</string>
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>43</width>
+       <width>47</width>
        <height>41</height>
       </rect>
      </property>
@@ -346,22 +398,23 @@ font-weight: bold;</string>
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>100</y>
+       <y>110</y>
        <width>241</width>
-       <height>341</height>
+       <height>331</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <item>
-       <widget class="QLabel" name="data_input">
-        <property name="font">
-         <font>
-          <family>Arial</family>
-          <pointsize>16</pointsize>
-         </font>
+       <widget class="QTextBrowser" name="data_input">
+        <property name="styleSheet">
+         <string notr="true">color: white</string>
         </property>
-        <property name="text">
-         <string>data</string>
+        <property name="html">
+         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -392,7 +445,8 @@ font-weight: bold;</string>
 border: none;
 font-family: Arial;
 font-size: 18px;
-font-weight: bold;</string>
+font-weight: bold;
+overflow: scroll;</string>
         </property>
         <property name="text">
          <string>Başlık</string>
@@ -490,11 +544,181 @@ QPushButton:hover {
      </property>
     </widget>
    </widget>
+   <widget class="QFrame" name="container_history_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>150</y>
+      <width>281</width>
+      <height>461</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame{
+	background-color:rgb(0, 18, 25);
+    border-radius: 30px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QWidget" name="verticalLayoutWidget_5">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>110</y>
+       <width>241</width>
+       <height>331</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QTableWidget" name="tableWidget_3">
+        <property name="styleSheet">
+         <string notr="true">background: rgb(0, 18, 25);
+background-color:rgb(0, 18, 25);
+color: #bfbfbf; /* Yazı rengi*/
+border: none;
+font: arial</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_12">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>20</y>
+       <width>161</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_12">
+      <item>
+       <widget class="QLabel" name="category_title_3">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>-1</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: #fff;
+border: none;
+font-family: Arial;
+font-size: 18px;
+font-weight: bold;</string>
+        </property>
+        <property name="text">
+         <string>Ekran Süresi</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_16">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>43</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="backLayout_2">
+      <item>
+       <widget class="QPushButton" name="back_button_2">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_17">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>20</y>
+       <width>43</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="next_buttonLayout_2">
+      <item>
+       <widget class="QPushButton" name="next_button_2">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QLineEdit" name="search_2">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>70</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: #fff;
+</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="verticalLayoutWidget_18">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>43</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_16">
+      <item>
+       <widget class="QPushButton" name="search_button_2">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QComboBox" name="comboBox">
+     <property name="geometry">
+      <rect>
+       <x>152</x>
+       <y>71</y>
+       <width>111</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: #fff</string>
+     </property>
+    </widget>
+   </widget>
    <zorder>frame_32</zorder>
    <zorder>container_7</zorder>
    <zorder>frame_29</zorder>
    <zorder>container_history</zorder>
    <zorder>container_content</zorder>
+   <zorder>container_history_3</zorder>
   </widget>
   <action name="actionAyarlar">
    <property name="text">
