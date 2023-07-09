@@ -56,6 +56,7 @@
   - Arayüzde buton ile aktifleştirme-pasifleştirme
   - Aktif-Pasif renk geçişleri
 <h3>Tasarlanan arayüzden görüntüler:</h3>
-![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/dbcc3b21-4a4a-49e1-b90e-600ddcb57c85) 
- ![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/124b4038-ca0b-4c64-9f35-929a90195cf1) 
- ![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/394fd3e1-b02b-4702-9b7c-6afcde4869d8) 
+
+1-  [![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/dbcc3b21-4a4a-49e1-b90e-600ddcb57c85)](#)
+2-  [![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/124b4038-ca0b-4c64-9f35-929a90195cf1)](#)
+3- [![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/394fd3e1-b02b-4702-9b7c-6afcde4869d8)](#)
