@@ -5,7 +5,7 @@
   - Saat
   - Tarih
     - Bugünün tarihi, yarının tarihi, 30 gün sonrasının tarihi gibi detayları verebilme.
-  - Alarm
+  - Alarm kurma
   - Anımsatıcı (Zamanı gelince okuyabilme)
     - Hızlı anımsatıcı
     - Anımsatıcı okuma
@@ -19,14 +19,12 @@
     - Notları okuma
       - Notları getirmeden önce MYSQL'deki LIKE Komutu sayesinde işlemler gerçekleştirebilme
       - SELECT * FROM niyetli.notes where note_title LIKE 'zmx%';	
-    - Kaynak
-    - Son & İlk 5(x) notu getirme
+    - Son & İlk x notu getirme
     - Not silme
     - Not güncelleme
-  - Not sayısı öğrenme
+    - Not sayısı öğrenme
 - Hava Durumu Kontrolu
-- Dosya operasyonları
-    - Dosya operasyonlarında kopyalanan dosya yolu üzerindeki dosya isimlerini değiştirme hizalama
+- Dosya operasyonları    
 - Windows operasyonları
   - Metin okuma
   - PDF okuma
@@ -35,8 +33,11 @@
 - İşletim Sistemi Operasyonları
   - Bilgisayar Kapatma/Bekletme/Yeniden Başlatma
     - Bu işlemlerin iptali
+    - Otomasyon oluşturabilme(Otomatik)
 - Mail İşlemleri
-  - Girilen mail adresine mail gönderme işlemi
+  - Girilen mail adresine mail gönderme işlemi.
+  - Gelen mailleri kontrol etme
+  - Yıldızlı mail kontrolü ve bildirimi
 - Ekran Süresi
   - Genel çalışır bir ekran zamanlayıcısı
   - Günde hangi programa kaç gere girildi? Sorusuna cevap bulabilme
@@ -44,15 +45,17 @@
   - Kullanıcıya Ekran Süresi istatistiklerini verebilme.
 - Tarayıcı işlemleri
   - Tarayıcıdaki belirli yerdeki metni seslendirme
-    - Beautiful Soup kütüphanesi kullanarak bir web sitesindeki HTML etiketlerindeki yazıları çekebilme
-  - Scroll Down - Up işlemleri
+  - Ekranda okuma yaparken sesli komutlarla; Scroll Down - Up işlemleri yapabilme
   - Sekme işlemleri (değiştirme, yeni sekme açma, kapama)
-  - Arama motoru araması (DuckDuck Go)
+  - Arama motoru araması (DuckDuck Go) yapabilme
   - Arama motorunda söylenen sonuca giriş yapabilme
-- Arayüz hazırlama
+- Arayüz 
   - Proje ile uyumlu çalışacak şekilde arayüz
+  - Yukarıdaki işlemlerin bir çoğunu tasarlanan arayü sayesinde görüntüleme ve yönetebilme
   - Diyalogları ve Komutları kaydedecek şekilde arayüz üzerinde gösterim gerçekleştirebilme
-  - Arayüz ile birçok işlem görüntülenebilmesi
-    - Notlar, Anımsatıcılar, Ekran süresi istatistikleri, Komut geçmişi
   - Arayüzde buton ile aktifleştirme-pasifleştirme
   - Aktif-Pasif renk geçişleri
+<h3>Tasarlanan arayüzden görüntüler:</h3>
+<li> ![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/dbcc3b21-4a4a-49e1-b90e-600ddcb57c85) </li>
+<li> ![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/124b4038-ca0b-4c64-9f35-929a90195cf1) </li>
+<li> ![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/394fd3e1-b02b-4702-9b7c-6afcde4869d8) </li>
