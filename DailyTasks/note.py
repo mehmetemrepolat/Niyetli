@@ -1,4 +1,6 @@
 from datetime import datetime, date, timedelta, time
+
+import pyperclip
 import pyperclip as pc
 from Niyetli.database.db_connector import Database
 from Niyetli.DailyTasks.reminder import Reminder
@@ -15,7 +17,7 @@ class Note:
     # Tutulan notların düzenli bir şekilde kaydının gerçekleşmesi gerekiyor.
     # Not kategorisi şeklinde notlar sınıflandırılabilir.
 
-    def return_similar_notes(self, note):
+    def return_similar_notes(self, note):  # Bunu Niyetli.py dosyası içerisinde arama kısmı için kullanılacak
         similar_notes = self.db.get_results(f"SELECT note, note_id FROM notes where note LIKE '{note}%'")
         return similar_notes
 
@@ -95,7 +97,7 @@ class LocalNote:
             f.write(f"\n{note_remind_time}\t")
         f.close()
         Contents = open("NoteContents.txt", "w")
-        Contents.write(f"Bilgiler: noteId, {note_title}, {note}, {note_category}, {today}, {self.get_hour(self)}")
+        Contents.write(f"Bilgiler: noteId, {note_title}, {note}, {note_category}, {self.today}, {self.get_hour(self)}")
         Contents.close()
 
     def coppy_to_localNotes(self):
