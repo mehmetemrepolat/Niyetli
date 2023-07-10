@@ -1,5 +1,6 @@
 import mysql.connector
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
+import datetime
 
 class Database:
     def __init__(self):
@@ -302,29 +303,22 @@ class Database:
             print("Data added")
             return
 
+    def get_timer_statics(self, number_of_stat=None, days_stat=-1):
+        query = f"SELECT program_name, secreen_time, secreen_date, day_counter FROM secreen_timer"
+        if number_of_stat is not None:
+            query += f" LIMIT {number_of_stat}"
+
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+
+        # Tarihi düz tarih formatına çevir
+        result = [
+            (row[0], row[1], datetime.datetime.strptime(str(row[2]), "%Y-%m-%d").date().strftime("%d-%m-%Y"), row[3])
+            for row in result]
+
+        return result
 
 
-deneme = Database()
-print(deneme.get_note_content("1 2 anan das al sk  5"))
-"""
-note_add(self, note_title, note, note_create_date, note_category, note_time): Bu metot, veritabanına yeni bir not
-    eklemek için kullanılır. note_title, note, note_create_date, note_category, ve note_time parametreleri ile 
-    notun başlık, içerik, oluşturma tarihi, kategori ve saat bilgileri alınır. Veritabanına INSERT SQL sorgusu
-    ile yeni bir kayıt eklenir. Eğer aynı başlığa sahip bir not zaten varsa, kullanıcıya "Bu not başlıklı bir
-    not alınmış gözüküyor, Bu notu değiştirmek ister misiniz?" şeklinde bir soru yöneltir ve başlığın sonuna * 
-    ekleyerek benzersizleştirme yapar.
-    
-fast_note(self, note): Bu metot, hızlı bir şekilde not eklemek için kullanılır. note parametresi ile not içeriği
-    alınır. Not başlığı, ilk 5 kelime kullanılarak oluşturulur ve note_create_date ve note_time bilgileri şu anki
-    tarih ve saat olarak atanır. Veritabanına INSERT SQL sorgusu ile yeni bir kayıt eklenir. Eğer aynı başlığa
-    sahip bir not zaten varsa, başlığın sonuna * ekleyerek benzersizleştirme yapar.
-
-update_note(self, note_id, note_title=None, note=None, note_create_date=None, note_category=None, note_time=None):
-    Bu metot, mevcut bir notu güncellemek için kullanılır. note_id parametresi ile güncellenecek notun ID'si alınır.
-    note_title, note, note_create_date, note_category, ve note_time parametreleri ile güncellenecek notun yeni başlık,
-    içerik, oluşturma tarihi, kategori ve saat bilgileri alınır. Veritabanına UPDATE SQL sorgusu ile güncelleme yapılır.
-
-delete_note(self, note_title): Bu metot, bir notu silmek için kullanılır. note_title parametresi ile silinecek notun
-    başlık bilgisi alınır. Veritabanından DELETE SQL sorgusu ile not silinir.
-
-"""
+# deneme = Database()
+# print(deneme.get_timer_statics())

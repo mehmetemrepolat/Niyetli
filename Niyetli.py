@@ -1,18 +1,13 @@
 import time
-
-
-from PyQt5.QtWidgets import QMainWindow, QTableWidget, QApplication, QLabel, QFrame, QToolTip, QHeaderView, QTableWidgetItem, QListView, QLineEdit, QPushButton, QCommandLinkButton, QFileDialog, QMenuBar, QMenu, QStatusBar, QTextBrowser, QTextEdit
+from PyQt5.QtWidgets import QMainWindow, QTableWidget, QApplication, QLabel, QFrame, QHeaderView, QTableWidgetItem, QLineEdit, QPushButton, QTextBrowser
 from PyQt5 import uic, QtCore, QtWidgets
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap, QResizeEvent, QCursor, QIcon, QTransform
-from PyQt5.QtCore import QThread, pyqtSignal, Qt, QFile, QPoint
-from PyQt5.QtWidgets import QGroupBox
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap, QIcon
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer
 from database.db_connector import Database
 import sys
-from PyQt5.QtGui import QKeySequence
 import threading
 import pygame
-
-#from DailyTasks.secreen_timer import SecreenTimer
+# from DailyTasks.secreen_timer import SecreenTimer
 from DailyTasks.voiceNotes import VoiceNotes
 
 
@@ -26,7 +21,7 @@ class WorkerThread(QThread):
             # self.dialogAdded.emit(text)
 
 
-class command_com_ui(QMainWindow):
+class CommandComUI(QMainWindow):
 
     def write(self):
         print("Deneme")
@@ -40,7 +35,7 @@ class command_com_ui(QMainWindow):
         self.oldPos = event.globalPos()
 
     def __init__(self, ui):
-        super(command_com_ui, self).__init__()
+        super(CommandComUI, self).__init__()
         uic.loadUi("command_communication.ui", self)
         self.setWindowOpacity(0.8)  # İstenilen saydamlık değerini ayarlayabilirsin (0.0 - 1.0)
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -97,7 +92,6 @@ class UI(QMainWindow):
         self.niyetli_status.setStyleSheet("#frame_32{border-radius:25px; border:5px solid rgb(0, 18, 25); background-color: #eb0000;}")
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)  # Etraftaki boşları siler
-        # self.command = self.findChild(QLineEdit, "a_input")
         self.comand_comm = self.findChild(QPushButton, "commandCenter_button")
 
 
@@ -106,22 +100,17 @@ class UI(QMainWindow):
 
         self.next_button.clicked.connect(lambda: self.change_categoryList("next"))
 
-
         self.previousCategory = self.findChild(QPushButton, "back_button")
         self.previousCategory.setIcon(QIcon("file_imgs/back.ico"))
 
         self.back_button.clicked.connect(lambda: self.change_categoryList("back"))
 
-
-        # self.command.returnPressed.connect(self.addToValues)
         self.niyetli_buton.clicked.connect(self.ContainerState)
-
 
         self.command_ui_isOpen = False
         self.commandCenter_button.clicked.connect(self.command_com_state)
 
-        self.command_window = command_com_ui(self)
-
+        self.command_window = CommandComUI(self)
 
         self.search_Button = self.findChild(QPushButton, "search_button")
         self.searchBar_status = False
@@ -146,7 +135,6 @@ class UI(QMainWindow):
         # self.previous_category = "commands"
 
         self.category_title = self.findChild(QLabel, "category_title")
-
         self.QTable = self.findChild(QTableWidget, "tableWidget")
         # self.tableWidget.setColumnCount(3)
 
@@ -159,9 +147,7 @@ class UI(QMainWindow):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
 
         header_style = "QHeaderView::section { background-color: <renk>; opacity: <opaklık>; border: none;  padding-left: 5px; }"
-
         self.hideContainerHistory = self.findChild(QPushButton, "closebtn")
-
         self.hideContainerHistory.clicked.connect(self.hide_ContainerHistory)
 
 
@@ -280,6 +266,7 @@ class UI(QMainWindow):
 
 
     def change_categoryList(self, way):
+        global tableWidget
         data = None
 
         def category_changer(index):
@@ -308,6 +295,9 @@ class UI(QMainWindow):
                 elif self.category_list[index][0] == "Sesli Notlar":
                     voice_notes = self.db.show_voiceNotes()
                     content_data = voice_notes
+                elif self.category_list[index][0] == "SecreenTimer":
+                    content_data = self.db.show_onlyNotes()
+
                 #elif self.category_list[index][0] == "SecreenTimer":
                     #secren_time_datas = self.sc.get_statistics()
                 else:
@@ -320,9 +310,11 @@ class UI(QMainWindow):
         if way == "next":
             self.category_counter += 1
             data = category_changer(self.category_counter)
+            print(self.current_category)
 
 
         elif way == "back":
+            print(self.current_category)
             self.category_counter -= 1
             if self.category_counter == -1:
                 self.category_counter = len(self.category_list) - 1
@@ -340,7 +332,10 @@ class UI(QMainWindow):
             for row, value in enumerate(data):
 
                 if self.current_category == "Sesli Notlar":
+
                     tableWidget.setColumnCount(2)  # Sadece 2 sütun olduğunu belirt
+                    tableWidget.horizontalHeader().setVisible(False)
+
                     button = QPushButton()
                     button.setIcon(QIcon("file_imgs/play.ico"))
                     button.setStyleSheet("text-align: left; padding-left: 0px;")  # ikonu sola hizala
@@ -363,9 +358,7 @@ class UI(QMainWindow):
                                     # self.play_voice_note(str(tableWidget.item(row, 1).text()))
                                     button.setIcon(QIcon("file_imgs/stop.ico"))
                                     button.setObjectName("stopButton")  # Düğmenin adını güncelle
-
                                     ############
-
                                 except Exception as e:
                                     print(e)
 
@@ -375,6 +368,7 @@ class UI(QMainWindow):
                                 button.setObjectName("playButton")  # Düğmenin adını güncelle
                         except Exception as e:
                             print(e)
+
 
                     def timer_changer(duration):
                         def change():
@@ -400,8 +394,48 @@ class UI(QMainWindow):
                     tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
                     tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-#
+
+
+
+                elif self.current_category == "SecreenTimer":
+                    stat = self.db.get_timer_statics()
+                    column_headers = ['Program İsmi', 'Süre(dk)', 'Tekrar']
+                    sutun1 = column_headers[0]
+                    sutun2 = column_headers[1]
+                    sutun3 = column_headers[2]
+                    tableWidget.setColumnCount(3)  # Sadece 3 sütun olduğunu belirt
+                    # Sütun başlıklarını ekleyin
+                    tableWidget.setHorizontalHeaderLabels(column_headers)
+                    tableWidget.horizontalHeader().setVisible(True)
+                    # İlk sütuna sütun başlığını ekleyin
+                    header_item1 = QTableWidgetItem(sutun1)
+                    tableWidget.setHorizontalHeaderItem(0, header_item1)
+                    # İkinci sütuna sütun başlığını ekleyin
+                    header_item2 = QTableWidgetItem(sutun2)
+                    tableWidget.setHorizontalHeaderItem(1, header_item2)
+                    # Üçüncü sütuna sütun başlığını ekleyin
+                    header_item3 = QTableWidgetItem(sutun3)
+                    tableWidget.setHorizontalHeaderItem(2, header_item3)
+
+                    for i, data in enumerate(stat):
+                        program_ismi = data[0]
+                        sure = data[1]  # Saniye cinsinden verilir
+                        tekrar = data[3]
+                        sure = int(sure) / 60
+                        if sure < 1:
+                            sure = 1
+                        tableWidget.setItem(i, 0, QTableWidgetItem(program_ismi))
+                        tableWidget.setItem(i, 1, QTableWidgetItem(str(int(sure))))
+                        tableWidget.setItem(i, 2, QTableWidgetItem(tekrar))
+
+                    tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)  # İkinci sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)  # Üçüncü sütunu içeriğe göre genişlet
+                    tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
                 else:
+                    tableWidget.horizontalHeader().setVisible(False)
+
                     item = QTableWidgetItem(str(value))  # Değeri doğrudan al
                     tableWidget.setItem(row, 0, item)
         except Exception as e:
@@ -471,7 +505,7 @@ class UI(QMainWindow):
 
 
     def openCommandUI(self):
-        self.command_window = command_com_ui(self)
+        self.command_window = CommandComUI(self)
         self.command_window.show()
 
 
@@ -494,6 +528,6 @@ class UI(QMainWindow):
 
 app = QApplication(sys.argv)
 ui_window = UI()
-command_window = command_com_ui(ui_window)
+command_window = CommandComUI(ui_window)
 # command_window.show()
 app.exec_()

@@ -7,7 +7,7 @@ from datetime import time, date, datetime, timedelta
 import datetime
 import hashlib
 
-db = Database()
+db_s = Database()
 
 
 Programs = []  # Çalışan program isimleri listesi
@@ -55,9 +55,9 @@ class SecreenTimer:
     #
 
     def get_all_statics(self):
-        query = f"SELECT program_name, secreen_time, secreen_date, day_counter FROM secreen_timer"
-        data = db.get_results(query)
-        return data
+        statics = db_s.get_timer_statics()
+        return statics
+
 
     def get_statistics(self, number_of_stat=None, first_last_stat="ASC", days_stat=7):
         today = datetime.date.today()
@@ -66,35 +66,8 @@ class SecreenTimer:
         query = f"SELECT program_name, secreen_time, secreen_date, day_counter FROM secreen_timer WHERE secreen_date >= '{asked_date}'"
         if number_of_stat is not None:
             query += f" LIMIT {number_of_stat}"
-        data = db.get_results(query)
-        counts = {}
-        for item in data:
-            if item[0] in counts:
-                counts[item[0]] += int(item[1])
-            else:
-                counts[item[0]] = int(item[1])
 
-        result = []
-        for item in data:
-            found = False
-            for r in result:
-                if r['program_name'] == item[0]:
-                    r['count'] += counts[item[0]]
-                    r['time'] += int(item[3])
-                    found = True
-                    break
-            if not found:
-                result.append({
-                    'program_name': item[0],
-                    'count': counts[item[0]],
-                    'time': int(item[3])
-                })
 
-        final_result = []
-        for item in result:
-            final_result.append([item['program_name'], item['count'], item['time']])
-
-        return final_result
 
 
     def secreen_timer(self):
@@ -128,7 +101,7 @@ class SecreenTimer:
                 pass
         for x in range(0, len(Programs)):
             program_id = self.md5_hash(Programs[x])
-            db.timer_into_database(program_id, Programs[x], '1', Times[x], Day_Counter[x])
+            db_s.timer_into_database(program_id, Programs[x], '1', Times[x], Day_Counter[x])
 
 
 
@@ -144,3 +117,5 @@ print(sc.get_all_statics())
 
 # print("---")
 # print(list[0])
+
+
