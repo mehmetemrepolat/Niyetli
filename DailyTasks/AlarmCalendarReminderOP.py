@@ -70,9 +70,34 @@ class DateOperations:
         PostQuitMessage(0)
         return 0
 
+    def get_date(self, date_str):
+        date_format = "%Y-%m-%d"
+        date_obj = datetime.strptime(date_str, date_format).date()
+        today = date.today()
+        diff = date_obj - today
+        today_d = diff.days
+
+        if today_d == 0:
+            return "Bugün"
+        elif today_d == -1:
+            return "Dün"
+        elif -7 <= today_d < -1:
+            return "Geçen Hafta"
+        elif date_obj.month == today.month and today_d < -7:
+            return "Bu Ay"
+        else:
+            return "Geçen Ay"
+
+
+# do = DateOperations()
+
+# print(do.get_date("2023-06-30"))  # Geçen Ay
+# print(do.get_date("2023-07-15"))  # Geçen Hafta
+# print(do.get_date("2023-07-17"))  # Dün
+# print(do.get_date("2023-07-18"))  # Bugün
 
 # show_balloon("Niyetli'den mesaj var!", "Hatalar düzeltildi, Performans iyileştirmeleri yapıldı, Kedi videolarıyla kalpler eridi.")
-    # today = datetime.today()
+# today = datetime.today()
 # tomorrow = datetime.today()+timedelta(+1)
 # print(datetime.now().strftime("%H:%M"))
 # print(today.strftime("%A, %B %d, %Y"))
