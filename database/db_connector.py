@@ -19,6 +19,12 @@ class Database:
         result = mycursor.fetchall()
         return result
 
+
+    def get_today_datas(self, category):
+        pass
+    def get_past_datas(self, category):
+        pass
+
 # >------------------------------------------------------------------------------------------------<
 # >-------------------------------------------   NOTES   ------------------------------------------<
 # >------------------------------------------------------------------------------------------------<
@@ -320,5 +326,5 @@ class Database:
         return result
 
 
-# deneme = Database()
-# print(deneme.get_timer_statics())
+deneme = Database()
+print(deneme.show_voiceNotes())

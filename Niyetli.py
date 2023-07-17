@@ -1,5 +1,5 @@
 import time
-from PyQt5.QtWidgets import QMainWindow, QTableWidget, QApplication, QLabel, QFrame, QHeaderView, QTableWidgetItem, QLineEdit, QPushButton, QTextBrowser
+from PyQt5.QtWidgets import QMainWindow, QTableWidget, QApplication, QLabel, QFrame, QHeaderView, QTableWidgetItem, QLineEdit, QPushButton, QTextBrowser, QRadioButton
 from PyQt5 import uic, QtCore, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap, QIcon
 from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer
@@ -40,10 +40,8 @@ class CommandComUI(QMainWindow):
         self.setWindowOpacity(0.8)  # İstenilen saydamlık değerini ayarlayabilirsin (0.0 - 1.0)
         self.setWindowFlag(Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)  # Etraftaki boşları siler
-
         self.command = self.findChild(QLineEdit, "a_input")
         self.hideCommandUI = self.findChild(QPushButton, "closebtn")
-
         self.hideCommandUI.clicked.connect(self.hide_command_ui)
         self.ui = ui
         self.command.returnPressed.connect(self.add_to_values)
@@ -118,6 +116,10 @@ class UI(QMainWindow):
         self.search_Button.setIcon(QIcon("file_imgs/search.ico"))
         self.search_Button.clicked.connect(self.searchText)
 
+        self.add_content_button = self.findChild(QPushButton, "add_content")
+        self.add_content_button.setIcon(QIcon("file_imgs/plus.ico"))
+
+
         self.setWindowOpacity(1.0)  # İstenilen saydamlık değerini ayarlayabilirsin (0.0 - 1.0)
 
         self.pixmap = QPixmap("Niyetli_small.png")
@@ -129,15 +131,11 @@ class UI(QMainWindow):
         self.commands = ["anan", "anan2"]
         self.notlar = ["not1", "not2"]
         self.animsat = ["1 Lorem Ipsum", "2 Lorem Ipsum", "3 Lorem Ipsum", "4 Lorem Ipsum", "5 Lorem Ipsum", "6 Lorem Ipsum"]
-
-
         # self.current_category = "commands"  # Başlangıçta gösterilecek kategori
         # self.previous_category = "commands"
-
         self.category_title = self.findChild(QLabel, "category_title")
         self.QTable = self.findChild(QTableWidget, "tableWidget")
         # self.tableWidget.setColumnCount(3)
-
         tableWidget = self.findChild(QTableWidget, "tableWidget")
         tableWidget.setRowCount(len(self.commands))
         tableWidget.setColumnCount(len(self.commands[0]))
@@ -269,6 +267,10 @@ class UI(QMainWindow):
         global tableWidget
         data = None
 
+        def get_past_data(category):
+            self.db.get_past_datas(category)
+
+
         def category_changer(index):
             if index == len(self.category_list):
                 self.category_counter = 0
@@ -298,8 +300,9 @@ class UI(QMainWindow):
                 elif self.category_list[index][0] == "SecreenTimer":
                     content_data = self.db.show_onlyNotes()
 
-                #elif self.category_list[index][0] == "SecreenTimer":
-                    #secren_time_datas = self.sc.get_statistics()
+                # elif self.category_list[index][0] == "SecreenTimer":
+                    # secren_time_datas = self.sc.get_statistics()
+
                 else:
                     print("Hata!")
                 return content_data
@@ -330,6 +333,8 @@ class UI(QMainWindow):
             print("Hata:", e)
         try:
             for row, value in enumerate(data):
+
+                # >------------------------------------------- Sesli Notlar ----------------------------------------------<
 
                 if self.current_category == "Sesli Notlar":
 
@@ -395,7 +400,7 @@ class UI(QMainWindow):
                     tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
-
+                # >------------------------------------------- SecreenTimer ----------------------------------------------<
 
                 elif self.current_category == "SecreenTimer":
                     stat = self.db.get_timer_statics()
@@ -432,6 +437,36 @@ class UI(QMainWindow):
                     tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)  # İkinci sütunu içeriğe göre genişlet
                     tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)  # Üçüncü sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+                # animsaticilar
+                elif self.current_category == "animsaticilar":
+                    tableWidget.setColumnCount(2)  # Sadece 2 sütun olduğunu belirt
+                    tableWidget.horizontalHeader().setVisible(False)
+                    radioButton = QRadioButton()
+                    radioButton.setObjectName("reminderDone")
+
+                    def radioButton_filled():
+                        try:
+                            pass
+
+                        except Exception as e:
+                            print("Anımsatıcılarda Hata! ", e)
+
+
+                    if row == 0:
+                        tableWidget.setItem(row, 0, QTableWidgetItem('Bugün')) # Yazı büyütünu büyütmek gerekir
+                        tableWidget.setSpan(row, 0, 1, 2)
+                        #tableWidget.horizontalHeader().setSectionResizeMode(0, QTableWidget.Fixed)
+
+
+                    else:
+                        tableWidget.setCellWidget(row, 0, radioButton)
+                        item = QTableWidgetItem(str(value))
+                        tableWidget.setItem(row, 1, item)
+
+                        tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                        tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
+                    tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
 
                 else:
                     tableWidget.horizontalHeader().setVisible(False)
