@@ -128,8 +128,8 @@ class UI(QMainWindow):
         self.niyetli_logo.setAlignment(Qt.AlignJustify)  # Resmi ortalama
 
         model = QStandardItemModel()
-        self.commands = ["anan", "anan2"]
-        self.notlar = ["not1", "not2"]
+        self.commands = ["command"]
+        self.notlar = []
         self.animsat = ["1 Lorem Ipsum", "2 Lorem Ipsum", "3 Lorem Ipsum", "4 Lorem Ipsum", "5 Lorem Ipsum", "6 Lorem Ipsum"]
         # self.current_category = "commands"  # Başlangıçta gösterilecek kategori
         # self.previous_category = "commands"
@@ -289,9 +289,19 @@ class UI(QMainWindow):
                 self.current_category = self.category_list[index][0]
                 self.category_title.setText(label_name)
                 if self.category_list[index][0] == "commands":
-                    content_data = self.commands
+                    content_data = self.db.showCommands()
+
                 elif self.category_list[index][0] == "notlar":
-                    content_data = self.db.show_onlyNotes()
+                    content_data = self.db.showNotesDatas()
+                    note_list = []
+                    notes_contents = []
+                    # Burada for ile data yüklemesi gerçekleştirmemiz gerekiyor.
+                    for x in range(0, len(content_data)):
+                        note_list.append(content_data[x][1])
+                        notes_contents.append([content_data[x][0], content_data[x][2], content_data[x][3], content_data[x][4]])
+                    content_data = note_list
+                    # print(notes_contents)
+
                 elif self.category_list[index][0] == "animsaticilar":
                     content_data = self.animsat
                 elif self.category_list[index][0] == "Sesli Notlar":
@@ -337,7 +347,6 @@ class UI(QMainWindow):
                 # >------------------------------------------- Sesli Notlar ----------------------------------------------<
 
                 if self.current_category == "Sesli Notlar":
-
                     tableWidget.setColumnCount(2)  # Sadece 2 sütun olduğunu belirt
                     tableWidget.horizontalHeader().setVisible(False)
 
@@ -396,8 +405,24 @@ class UI(QMainWindow):
                     tableWidget.setCellWidget(row, 0, button)
                     item = QTableWidgetItem(str(value))  # Değeri doğrudan al
                     tableWidget.setItem(row, 1, item)
-                    tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
-                    tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
+                    tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+                # >--------------------------------------------- Commands ------------------------------------------------<
+
+                elif self.current_category == "commands":
+                    stat = self.db.showCommands()
+                    column_headers = ["Komut"]
+                    tableWidget.setHorizontalHeaderLabels(column_headers)
+                    tableWidget.horizontalHeader().setVisible(True)
+                    header_item1 = QTableWidgetItem(sutun1)
+                    tableWidget.setHorizontalHeaderItem(0, header_item1)
+
+                    for i, data in enumerate(stat):
+                        komut = data[0]
+                        tableWidget.setItem(i, 0, QTableWidgetItem(program_ismi))
+
+                    tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
                 # >------------------------------------------- SecreenTimer ----------------------------------------------<
@@ -447,15 +472,12 @@ class UI(QMainWindow):
                     def radioButton_filled():
                         try:
                             pass
-
                         except Exception as e:
                             print("Anımsatıcılarda Hata! ", e)
-
-
                     if row == 0:
-                        tableWidget.setItem(row, 0, QTableWidgetItem('Bugün')) # Yazı büyütünu büyütmek gerekir
+                        tableWidget.setItem(row, 0, QTableWidgetItem('Bugün'))  # Yazı büyütünu büyütmek gerekir
                         tableWidget.setSpan(row, 0, 1, 2)
-                        #tableWidget.horizontalHeader().setSectionResizeMode(0, QTableWidget.Fixed)
+                        # tableWidget.horizontalHeader().setSectionResizeMode(0, QTableWidget.Fixed)
 
 
                     else:
@@ -467,6 +489,45 @@ class UI(QMainWindow):
                         tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
+                # >---------------------------------------------- Notlar -------------------------------------------------<
+                elif self.current_category == "notlar":
+                    notes = self.db.showNotesDatas()
+                    tableWidget.horizontalHeader().setVisible(False)
+                    column_headers = ['Not Başlığı', 'Kategori', 'Tarih']
+                    sutun1 = column_headers[0]
+                    sutun2 = column_headers[1]
+                    sutun3 = column_headers[2]
+                    tableWidget.setColumnCount(3)  # Sadece 2 sütun olduğunu belirt
+                    tableWidget.setHorizontalHeaderLabels(column_headers)
+                    tableWidget.horizontalHeader().setVisible(True)
+                    # İlk sütuna sütun başlığını ekleyin
+                    header_item1 = QTableWidgetItem(sutun1)
+                    tableWidget.setHorizontalHeaderItem(0, header_item1)
+                    # İkinci sütuna sütun başlığını ekleyin
+                    header_item2 = QTableWidgetItem(sutun2)
+                    tableWidget.setHorizontalHeaderItem(1, header_item2)
+                    # Üçüncü sütuna sütun başlığını ekleyin
+                    header_item3 = QTableWidgetItem(sutun3)
+                    tableWidget.setHorizontalHeaderItem(2, header_item3)
+
+                    for i, data in enumerate(notes):
+                        note_title = data[1]
+                        note_category = data[3]
+                        note_date = data[4]
+
+                        tableWidget.setItem(i, 0, QTableWidgetItem(note_title))
+                        tableWidget.setItem(i, 1, QTableWidgetItem(note_category))
+                        tableWidget.setItem(i, 2, QTableWidgetItem(note_date))
+
+                    tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)  # İkinci sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)  # Üçüncü sütunu içeriğe göre genişlet
+                    tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+
+
+
+                # >----------------------------------------------- Else --------------------------------------------------<
 
                 else:
                     tableWidget.horizontalHeader().setVisible(False)

@@ -26,6 +26,19 @@ class Database:
         pass
 
 # >------------------------------------------------------------------------------------------------<
+# >-----------------------------------------   COMMANDS   -----------------------------------------<
+# >------------------------------------------------------------------------------------------------<
+
+    def showCommands(self):
+        query = "SELECT command, command_process FROM command_history ORDER BY command_id"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        result = [(row[0], row[1]) for row in result]
+        return result
+
+
+# >------------------------------------------------------------------------------------------------<
 # >-------------------------------------------   NOTES   ------------------------------------------<
 # >------------------------------------------------------------------------------------------------<
 
@@ -152,6 +165,13 @@ class Database:
         result = [(row[0]) for row in result]
         return result
 
+    def showNotesDatas(self):
+        query = "SELECT note_id, note_title, note, note_category, note_create_date FROM notes ORDER BY note_id"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchall()
+        result = [(row[0], row[1], row[2], row[3], datetime.datetime.strptime(str(row[4]), "%Y-%m-%d").date().strftime("%d-%m-%Y")) for row in result]
+        return result
 
     def show_voiceNotes(self):
         query = "SELECT voice_note_title, voice_note_path, voice_note_categories From voice_notes"
@@ -326,5 +346,5 @@ class Database:
         return result
 
 
-deneme = Database()
-print(deneme.show_voiceNotes())
+# deneme = Database()
+# print(deneme.showNotesDatas())
