@@ -340,7 +340,7 @@ class Database:
 
         # Tarihi düz tarih formatına çevir
         result = [
-            (row[0], row[1], datetime.datetime.strptime(str(row[2]), "%Y-%m-%d").date().strftime("%d-%m-%Y"), row[3])
+            (row[0], row[1], datetime.datetime.strptime(str(row[2]), "%Y-%m-%d").date().strftime("%Y-%m-%d"), row[3])
             for row in result]
 
         return result
