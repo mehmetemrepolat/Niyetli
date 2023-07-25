@@ -15,6 +15,17 @@ class DateOperations:
         else:
             return today_d
 
+    @staticmethod
+    def get_string_date(date_str):
+        tarih = datetime.strptime(date_str, '%Y-%m-%d')
+        turkish_months = {
+            1: "Ocak", 2: "Şubat", 3: "Mart", 4: "Nisan", 5: "Mayıs", 6: "Haziran",
+            7: "Temmuz", 8: "Ağustos", 9: "Eylül", 10: "Ekim", 11: "Kasım", 12: "Aralık"
+        }
+        turkish_days = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"]
+        date_string = f"{tarih.day} {turkish_months[tarih.month]} {turkish_days[tarih.weekday()]}"
+
+        return date_string
 
     def get_date_w_string(self, date_input):
         # date = date.strftime()

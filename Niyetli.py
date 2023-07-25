@@ -288,8 +288,10 @@ class UI(QMainWindow):
                 label_name = self.category_list[index][1]
                 self.current_category = self.category_list[index][0]
                 self.category_title.setText(label_name)
+
                 if self.category_list[index][0] == "commands":
-                    content_data = self.db.showCommands()
+                    command_list = self.db.showCommands()
+                    content_data = command_list
 
                 elif self.category_list[index][0] == "notlar":
                     content_data = self.db.showNotesDatas()
@@ -413,14 +415,16 @@ class UI(QMainWindow):
                 elif self.current_category == "commands":
                     stat = self.db.showCommands()
                     column_headers = ["Komut"]
+                    sutun1 = column_headers[0]
                     tableWidget.setHorizontalHeaderLabels(column_headers)
                     tableWidget.horizontalHeader().setVisible(True)
+
                     header_item1 = QTableWidgetItem(sutun1)
                     tableWidget.setHorizontalHeaderItem(0, header_item1)
 
                     for i, data in enumerate(stat):
                         komut = data[0]
-                        tableWidget.setItem(i, 0, QTableWidgetItem(program_ismi))
+                        tableWidget.setItem(i, 0, QTableWidgetItem(komut))
 
                     tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
@@ -463,6 +467,14 @@ class UI(QMainWindow):
                     tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)  # Üçüncü sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
                 # animsaticilar
+
+                # Yapılacak işlem basit
+                # çekilen listede, son elemanın tarih bilgisine  sahip olması gerekmekte
+                # bundan dolayı her bir kategoride kullanılabilecek bir metod(get_string_date) oluşturucaz.
+                # Son verinin tarihini o
+                # metoda(AlarmCalenderReminderOP.DateOperations.get_string_date) gönderip
+                # string tarih verisi çekicez
+
                 elif self.current_category == "animsaticilar":
                     tableWidget.setColumnCount(2)  # Sadece 2 sütun olduğunu belirt
                     tableWidget.horizontalHeader().setVisible(False)
