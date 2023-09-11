@@ -51,16 +51,14 @@
   - Arama motorunda söylenen sonuca giriş yapabilme
  
 - Sesli Notlar
-  -	Sesli Not Ekleme
-		-Oluşturulan sesli notları görüntüleme
-		-Sesli notları oynatabilme
-		-Sesli notları durdurabilme
-		-Sesli notları silebilme
-		-Sesli Notların başlıklarını değiştirebilme
-		-Sesli notlar kodlarını speech to text yöntemiyle güncellemek gerekiyor,
-		-Sesli not içeriğini speech to text ile arayüzde görüntüleyebilme
-    -Arayüz ile birlikte sesli not oluşturabilme.
-
+  - Sesli Not Ekleme
+  - Oluşturulan sesli notları görüntüleme
+  - Sesli notları oynatabilme
+  - Sesli notları durdurabilme
+  - Sesli notları silebilme
+  - Sesli Notların başlıklarını değiştirebilme
+  -Sesli not içeriğini speech to text ile arayüzde görüntüleyebilme
+  -Arayüz ile birlikte sesli not oluşturabilme.
 
 - Arayüz 
   - Proje ile uyumlu çalışacak şekilde arayüz
