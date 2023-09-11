@@ -14,7 +14,7 @@ def close_tab():
     pyautogui.hotkey('ctrl', 'w')
 
 
-def change_tab(repeat = 1):
+def change_tab(repeat=1):
     if repeat == 1:
         time.sleep(sleep_time)
         pyautogui.hotkey('ctrl', 'tab')
@@ -58,10 +58,31 @@ def go_forward():
 
 
 # Scroll down işlemini gerçekleştirir
-def scroll_UpDown(pixels):
-    pyautogui.scroll(pixels, x=0, y=0)
+def scroll(direction, power=120):
+    pyautogui.keyDown("Ctrl")
+    if direction == "down":
+        pyautogui.scroll(-power)
+    elif direction == "up":
+        pyautogui.scroll(power)
+    pyautogui.keyUp("Ctrl")
+
+def copy_current_url():
+    from Niyetli.DailyTasks.secreen_timer import SecreenTimer
+    st = SecreenTimer()
+    program_name = st.get_ForeGroundApp()
+    browser_list = ["chrome", "opera", "edge", "mozilla"]
+    if program_name in browser_list:
+        pyautogui.hotkey("ctrl", "l")
+        pyautogui.hotkey("ctrl", "c")
+        return True
+    else:
+        return False
 
 
+# time.sleep(3)
+# scroll("up")
+# time.sleep(3)
+# scroll("down")
 # time.sleep(3)
 # scroll_UpDown(100)
 # go_to_url("youtube.com")
@@ -72,5 +93,3 @@ def scroll_UpDown(pixels):
 # text_search("Niyetli")
 # change_window(3)
 # change_tab(3)
-
-
