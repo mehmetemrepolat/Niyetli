@@ -1,8 +1,8 @@
 import pygame
 import threading
 # from Niyetli.database.db_connector import Database
+import time
 from mutagen.mp3 import MP3
-
 
 class VoiceNotes:
     # dib = Database()
@@ -18,20 +18,42 @@ class VoiceNotes:
                 pygame.mixer.music.play()
                 # Burada stop kısmını eklememiz gerekiyor
                 #time.sleep(duration)
-                #print("thread durdu")
+                # print("thread durdu")
                 ## stop iconunun getirilmesi gerekmekte
             thread = threading.Thread(target=play_thread, name="voice_name_thread")
             thread.start()
-
         except Exception as e:
             print(e)
 
 
-    def get_voice_duration(self, voice_path):
-        audio = MP3(voice_path)
+    def get_voice_duration(self, title):
+        audio = MP3(title)
         duration_s = audio.info.length
         return int(duration_s) + 1
 
 
-vc = VoiceNotes()
-print(vc.get_voice_duration("johncena.mp3"))
+    def voice_timer(self, signal=False):
+        if signal is not True:
+            start = time.time()
+            while True:
+                passed = time.time() - start
+                secs = int(passed % 60)
+                mins = int((passed // 60) % 60)
+                hours = int(passed // 3600)
+                time_str = f"{hours:02d}:{mins:02d}:{secs:02d}"
+                time.sleep(1)
+                return time_str
+
+
+    def passingTime(self):
+        start = time.time()
+        while True:
+            passed = time.time() - start
+            secs = int(passed % 60)
+            mins = int((passed // 60) % 60)
+            hours = int(passed // 3600)
+            print(f"{hours:02d}:{mins:02d}:{secs:02d}")
+            time.sleep(1)
+
+# vc = VoiceNotes()
+# vc.passingTime()

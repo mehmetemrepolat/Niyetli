@@ -1,14 +1,17 @@
 import time
-from PyQt5.QtWidgets import QMainWindow, QTableWidget, QApplication, QLabel, QFrame, QHeaderView, QTableWidgetItem, QLineEdit, QPushButton, QTextBrowser, QRadioButton
+from PyQt5.QtWidgets import QMainWindow, QGraphicsOpacityEffect, QTableWidget, QApplication, QLabel, QFrame, QHeaderView, QTableWidgetItem, QLineEdit, QPushButton, QTextBrowser, QRadioButton
 from PyQt5 import uic, QtCore, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap, QIcon
-from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer
+from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer, QSize
 from database.db_connector import Database
 import sys
 import threading
 import pygame
 # from DailyTasks.secreen_timer import SecreenTimer
 from DailyTasks.voiceNotes import VoiceNotes
+from mutagen.mp3 import MP3
+import pyaudio
+import wave  # Wave modülünü de içe aktardık
 
 
 class WorkerThread(QThread):
@@ -66,11 +69,159 @@ class CommandComUI(QMainWindow):
 
 
 
+class VoiceRecorderUI(QMainWindow):
+    from DailyTasks.voiceNotes import VoiceNotes
+
+    vn = VoiceNotes()
+
+    def recorder_toggle(self, toggle):
+        if toggle == 1:
+            self.toggle_recorder = True
+        elif toggle == 0:
+            self.toggle_recorder = False
+        else:
+            return "Error"
+
+    def voice_recording(self, title):
+        try:
+            FORMAT = pyaudio.paInt16
+            CHANNELS = 1
+            RATE = 44100
+            CHUNK = 1024
+            RECORD_SECONDS = 5  # Kaydedilecek süre (saniye)
+            OUTPUT_FILENAME = f"{title}.mp3"  # Kaydedilen sesin dosya adı
+            audio = pyaudio.PyAudio()
+            # Ses kaydetme işlemi
+            stream = audio.open(format=FORMAT, channels=CHANNELS,
+                                rate=RATE, input=True,
+                                frames_per_buffer=CHUNK)
+            frames = []
+            self.toggle_recorder = True
+            recording_thread = threading.Thread(target=self.record_audio, args=(title, CHUNK, frames))
+            recording_thread.start()
+
+        except Exception as e:
+            print(e)
+
+    def record_audio(self, title, chunk, frames):
+        # Kayıt ayarları
+        FORMAT = pyaudio.paInt16
+        CHANNELS = 1
+        RATE = 44100
+        CHUNK = 1024
+        RECORD_SECONDS = 5  # Kaydedilecek süre (saniye)
+        OUTPUT_FILENAME = f"VoiceNotes/{title}.mp3"  # Kaydedilen sesin dosya adı
+
+        audio = pyaudio.PyAudio()
+        stream = audio.open(format=FORMAT, channels=CHANNELS,
+                            rate=RATE, input=True,
+                            frames_per_buffer=chunk)
+
+        print("Kayıt başladı.")
+
+        try:
+            while self.toggle_recorder:
+                data = stream.read(chunk)
+                frames.append(data)
+        except KeyboardInterrupt:
+            print("Kayıt durduruldu.")
+        finally:
+            stream.stop_stream()
+            stream.close()
+            audio.terminate()
+
+            # Kaydedilen sesi WAV dosyasına kaydet
+            with wave.open(OUTPUT_FILENAME, 'wb') as wf:
+                wf.setnchannels(CHANNELS)
+                wf.setsampwidth(audio.get_sample_size(FORMAT))
+                wf.setframerate(RATE)
+                wf.writeframes(b''.join(frames))
+
+            print(f"Ses {OUTPUT_FILENAME} dosyasına kaydedildi.")
+
+    def update_timer_label(self):
+
+        start_time = time.time()
+        while self.isRecording:
+            passed = time.time() - start_time
+            mins, secs = divmod(int(passed), 60)
+            hours, mins = divmod(mins, 60)
+            time_str = f"{hours:02d}:{mins:02d}:{secs:02d}"
+            print(time_str)
+            self.voice_time_label.setText(time_str)
+            time.sleep(1)
+
+    def voice_record_button(self):
+        self.isRecording = not self.isRecording
+        if self.isRecording:
+            self.toggle_recorder = True
+            self.timer_thread = threading.Thread(target=self.update_timer_label)
+            self.timer_thread.start()
+
+            self.voice_recording("ses_kayıt")
+
+        else:
+            self.toggle_recorder = False
+
+
+    def __init__(self, ui):
+
+        super(VoiceRecorderUI, self).__init__()
+        uic.loadUi("VoiceRecord.ui", self)
+        self.setWindowOpacity(0.8)  # İstenilen saydamlık değerini ayarlayabilirsiniz (0.0 - 1.0)
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)  # Etraftaki boşları siler
+        self.ui = ui
+
+        self.voice_time_label = self.findChild(QLabel, "voice_time")  # Find your QLabel
+
+        passed_time = self.findChild(QLabel, "passed_time")
+        # passed_time.setText(self.vn.voice_timer())
+
+        self.micButton = self.findChild(QPushButton, "micButton")
+        self.micButton.setGeometry(100, 50, 64, 64)  # Button boyutunu ayarlayabilirsiniz.
+
+        # Saydam arka plan için stil özelliklerini ayarlayın
+        self.micButton.setStyleSheet("background-color: transparent; border: none;")
+
+        # Ikonu butonun boyutuna göre özelleştirin
+        icon = QIcon("file_imgs/mic.ico")
+        pixmap = icon.pixmap(QSize(64, 64))
+        self.micButton.setIcon(QIcon(pixmap))
+
+        # Butonun içeriğini tıklanabilir yapmak için QGraphicsOpacityEffect kullanın
+        self.iconOpacityEffect = QGraphicsOpacityEffect()
+        self.iconOpacityEffect.setOpacity(0.5)  # İçeriği saydam yapmak için bir değer ayarlayın
+        self.micButton.setGraphicsEffect(self.iconOpacityEffect)
+
+        # Butonun sadece simge alanına tıklanabilir yapmak için QPushButton'ın içeriğini tıklanabilir yapın
+        self.micButton.setIconSize(QSize(64, 64))
+        self.isRecording = False
+        self.toggle_recorder = False
+        self.micButton.clicked.connect(self.voice_record_button)
+
+        # closebtn
+        self.closebtn = self.findChild(QPushButton, "closebtn")
+        self.closebtn.clicked.connect(self.close_button)
+
+    def mousePressEvent(self, event):
+        self.oldPos = event.globalPos()
+
+
+    def close_button(self):
+        self.hide()
+
+    def mouseMoveEvent(self, event):
+        delta = event.globalPos() - self.oldPos
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()
+
+
 
 class UI(QMainWindow):
 
     db = Database()
-    #sc = SecreenTimer()
+    # sc = SecreenTimer()
     second_ui_file = "command_communication.ui"
 
     def __init__(self):
@@ -109,6 +260,8 @@ class UI(QMainWindow):
         self.commandCenter_button.clicked.connect(self.command_com_state)
 
         self.command_window = CommandComUI(self)
+
+        self.voiceRecord_window = VoiceRecorderUI(self)
 
         self.search_Button = self.findChild(QPushButton, "search_button")
         self.searchBar_status = False
@@ -160,6 +313,7 @@ class UI(QMainWindow):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.horizontalHeader().setVisible(False)
         self.container_content.setVisible(False)
+        self.current_playing_row = -1
 
         #for row, rowData in enumerate(self.values):
         #    item = QTableWidgetItem(str(rowData))
@@ -270,6 +424,14 @@ class UI(QMainWindow):
         def get_past_data(category):
             self.db.get_past_datas(category)
 
+        def is_music_playing(self):
+            try:
+                # pygame.mixer.music.get_busy() her zaman 0 dönüyorsa, pygame.mixer.music.get_pos() ile
+                # müziğin geçen süresini kontrol edebiliriz.
+                return pygame.mixer.music.get_pos() > 0
+            except Exception as e:
+                print(e)
+                return False
 
         def category_changer(index):
             if index == len(self.category_list):
@@ -327,6 +489,14 @@ class UI(QMainWindow):
             data = category_changer(self.category_counter)
             print(self.current_category)
 
+            try:
+                if is_music_playing(self):
+                    pygame.mixer.music.stop()
+                else:
+                    pass
+            except Exception as e:
+                print(e)
+
 
         elif way == "back":
             print(self.current_category)
@@ -334,6 +504,13 @@ class UI(QMainWindow):
             if self.category_counter == -1:
                 self.category_counter = len(self.category_list) - 1
             data = category_changer(self.category_counter)
+            try:
+                if is_music_playing(self):
+                    pygame.mixer.music.stop()
+                else:
+                    pass
+            except Exception as e:
+                print(e)
 
 
         try:
@@ -348,9 +525,14 @@ class UI(QMainWindow):
 
                 # >------------------------------------------- Sesli Notlar ----------------------------------------------<
 
+                # Parça durduğunda/bittiğinde ikon değişmiyor.
+                # Muhtemelen Thread çalışmıyor olabilir. Kontrol edilmesi gerekiyor.
+
                 if self.current_category == "Sesli Notlar":
                     tableWidget.setColumnCount(2)  # Sadece 2 sütun olduğunu belirt
                     tableWidget.horizontalHeader().setVisible(False)
+
+                    self.add_content_button.clicked.connect(self.openVoiceRecorderUI)
 
                     button = QPushButton()
                     button.setIcon(QIcon("file_imgs/play.ico"))
@@ -359,32 +541,55 @@ class UI(QMainWindow):
 
                     def button_clicked(row):
                         try:
-                            button = tableWidget.cellWidget(row, 0)  # Butonun doğru satıra ait olduğundan emin olun
-                            print("Deneme1:", button.objectName())
+                            if self.current_playing_row != -1:
+                                stop_playing(self.current_playing_row)  # Önceki çalma işlemi varsa durdurun
+
+                            button = tableWidget.cellWidget(row, 0)  # Butonun doğru satıra ait olduğundan emin ol
                             if button.objectName() == "playButton":
-                                print("Deneme2")
                                 try:
                                     voice_name = str(tableWidget.item(row, 1).text())
                                     voice_path = self.db.get_sound_from_db(voice_name)
                                     voice_path2 = f"userDirectory/voiceNotes/{voice_path}"
                                     vn = VoiceNotes()
-                                    vn.play_voice_note(voice_path2)
+                                    pygame.mixer.init()
+                                    pygame.mixer.music.load(voice_path2)
+                                    pygame.mixer.music.play()
                                     stop_time = vn.get_voice_duration(voice_path2)
                                     timer_changer(stop_time)
-                                    # self.play_voice_note(str(tableWidget.item(row, 1).text()))
                                     button.setIcon(QIcon("file_imgs/stop.ico"))
                                     button.setObjectName("stopButton")  # Düğmenin adını güncelle
-                                    ############
+                                    self.current_playing_row = row  # Mevcut çalan satırı güncelle
                                 except Exception as e:
                                     print(e)
-
                             else:
-                                # Durdurma işlemini buraya ekleyin
+                                stop_playing(row)  # Durdurma işlemini gerçekleştir
                                 button.setIcon(QIcon("file_imgs/play.ico"))
                                 button.setObjectName("playButton")  # Düğmenin adını güncelle
+
+                            update_buttons_state()  # Tüm düğmeleri güncelle
                         except Exception as e:
                             print(e)
 
+                    def stop_playing(row):
+                        try:
+                            pygame.mixer.music.stop()
+                        except Exception as e:
+                            print(e)
+
+                    def update_buttons_state():
+                        for i in range(tableWidget.rowCount()):
+                            try:
+                                button = tableWidget.cellWidget(i, 0)
+                                if isinstance(button, QPushButton):
+                                    if button.objectName() == "playButton":
+                                        pass
+                                    elif button.objectName() == "stopButton" and i != self.current_playing_row:
+                                        button.setObjectName("playButton")
+                                        button.setIcon(QIcon("file_imgs/play.ico"))
+                                    else:
+                                        pass
+                            except Exception as e:
+                                print(e)
 
                     def timer_changer(duration):
                         def change():
@@ -558,23 +763,21 @@ class UI(QMainWindow):
 
 
 
-
-    def play_voice_note(self, voice_title):
-        print("Deneme")
-        try:
-            path = self.db.get_sound_from_db(voice_title)
-            print("yol:", path)
-
-            def play_thread():
-                pygame.mixer.init()
-                pygame.mixer.music.load(path)
-                pygame.mixer.music.play()
-                # Burada stop kısmını eklememiz gerekiyor
-            thread = threading.Thread(target=play_thread)
-            thread.start()
-        except Exception as e:
-            print(e)
-
+#
+#    def play_voice_note(self, voice_title):
+#        try:
+#            path = self.db.get_sound_from_db(voice_title)
+#            # print("yol:", path)
+#
+#            def play_thread():
+#                pygame.mixer.init()
+#                pygame.mixer.music.load(path)
+#                pygame.mixer.music.play()
+#                # Burada stop kısmını eklememiz gerekiyor
+#            thread = threading.Thread(target=play_thread)
+#            thread.start()
+#        except Exception as e:
+#            print(e)
 
     def mousePressEvent(self, event):
         self.oldPos = event.globalPos()
@@ -612,6 +815,14 @@ class UI(QMainWindow):
             self.container_history.setVisible(True)
 
 
+    def openVoiceRecorderUI(self):
+        self.voiceRecord_window = VoiceRecorderUI(self)
+        self.voiceRecord_window.show()
+
+    def closeVoiceRecorderUI(self):
+        if self.voiceRecord_window is not None and self.voiceRecord_window.isVisible():
+            self.voiceRecord_window.hide()
+
     def openCommandUI(self):
         self.command_window = CommandComUI(self)
         self.command_window.show()
@@ -637,5 +848,7 @@ class UI(QMainWindow):
 app = QApplication(sys.argv)
 ui_window = UI()
 command_window = CommandComUI(ui_window)
+voiceRecord_window = VoiceRecorderUI(ui_window)
+# voiceRecord_window.show()
 # command_window.show()
 app.exec_()

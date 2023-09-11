@@ -345,6 +345,18 @@ class Database:
 
         return result
 
+# >------------------------------------------------------------------------------------------------<
+# >------------------------------------- ASSISTANT CHOICES-----------------------------------------<
+# >------------------------------------------------------------------------------------------------<
 
-# deneme = Database()
-# print(deneme.showNotesDatas())
+    def get_search_engine_choices(self):
+        query = "SELECT search_engine from user_preferences"
+        mycursor = self.db.cursor()
+        mycursor.execute(query)
+        result = mycursor.fetchone()
+        result = result[0]
+        return result
+
+
+deneme = Database()
+
