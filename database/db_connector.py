@@ -20,6 +20,17 @@ class Database:
         return result
 
 
+    def insert_to_table_with_query(self, query):
+        while True:
+            try:
+                self.cursor.execute(query)
+                self.db.commit()
+                break
+            except mysql.connector.IntegrityError as e:
+                print(e)
+        print(f"{self.cursor.rowcount} satır eklendi.")
+
+
     def get_today_datas(self, category):
         pass
     def get_past_datas(self, category):
@@ -209,10 +220,6 @@ class Database:
         return result
 
 
-
-
-
-
     def delete_note(self, note_title):
         delete_query = f"DELETE FROM notes WHERE note_id = {note_title}"
         self.cursor.execute(delete_query)
@@ -280,7 +287,6 @@ class Database:
         result = mycursor.fetchall()
         result = [(row[0], row[1], row[2], row[3]) for row in result]
         return result
-
 
 
 # >------------------------------------------------------------------------------------------------<
@@ -358,5 +364,4 @@ class Database:
         return result
 
 
-deneme = Database()
 
