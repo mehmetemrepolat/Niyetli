@@ -103,28 +103,28 @@ class DateOperations:
 # ----- Deneme Kod Alanı ------ #
 # Buradaki kodları Niyetli.py' geçireceğim. Bu şekilde verilerde tarih düzenlemesini
 #   düzgün bir şekilde gerçekleştirebilirim.
-
-do = DateOperations()
-datas = [["Not 1", "2023-07-01"], ["Not 1 ama uzun olan", "2023-07-01"], ["Not 2", "2023-07-11"], ["Not 3", "2023-07-17"]]
-
-temp_date = datas[0][1]
-
-for x in range(0, len(datas)):
-    title = do.get_date_info(datas[x][1])
-    if x == 0:
-        print(f"---{title}----")
-        print(f"----{datas[x][0]}----")
-
-    else:
-        if temp_date == datas[x][1]:
-            print(f"----{datas[x][0]}----")
-
-        else:
-            temp_Date = datas[x][1]
-            title = do.get_date_info(temp_Date)
-            print(f"---{title}----")
-            print(f"----{datas[x][0]}----")
-
+#
+# do = DateOperations()
+# datas = [["Not 1", "2023-07-01"], ["Not 1 ama uzun olan", "2023-07-01"], ["Not 2", "2023-07-11"], ["Not 3", "2023-07-17"]]
+#
+# temp_date = datas[0][1]
+#
+# for x in range(0, len(datas)):
+#     title = do.get_date_info(datas[x][1])
+#     if x == 0:
+#         print(f"---{title}----")
+#         print(f"----{datas[x][0]}----")
+#
+#     else:
+#         if temp_date == datas[x][1]:
+#             print(f"----{datas[x][0]}----")
+#
+#         else:
+#             temp_Date = datas[x][1]
+#             title = do.get_date_info(temp_Date)
+#             print(f"---{title}----")
+#             print(f"----{datas[x][0]}----")
+#
 
 # ----- Deneme Kod Alanı ------ #
 
