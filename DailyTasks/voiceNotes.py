@@ -1,11 +1,12 @@
 import pygame
 import threading
-# from Niyetli.database.db_connector import Database
+#from Niyetli.database.db_connector import Database
 import time
 from mutagen.mp3 import MP3
+import os
+
 
 class VoiceNotes:
-    # dib = Database()
 
     def play_voice_note(self, path):
         print("Yol:", path)
@@ -55,5 +56,23 @@ class VoiceNotes:
             print(f"{hours:02d}:{mins:02d}:{secs:02d}")
             time.sleep(1)
 
+    def name_for_VN(self, title="Yeni Sesli Not", directory="userDirectory/voiceNotes"):
+        vn = os.listdir(directory)
+        counter = 1
+
+        while True:
+            new_title = f"{title} {counter}"
+            if any(new_title in file for file in vn):
+                counter += 1
+            else:
+                return new_title
+
+
+
+
+
+
+
 # vc = VoiceNotes()
+# print(vc.name_for_VN())
 # vc.passingTime()
