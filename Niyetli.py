@@ -71,9 +71,11 @@ class CommandComUI(QMainWindow):
 
 class VoiceRecorderUI(QMainWindow):
     from DailyTasks.voiceNotes import VoiceNotes
+    from DailyTasks.AlarmCalendarReminderOP import DateOperations
 
     vn = VoiceNotes()
-
+    db = Database()
+    do = DateOperations()
     def recorder_toggle(self, toggle):
         if toggle == 1:
             self.toggle_recorder = True
@@ -104,13 +106,20 @@ class VoiceRecorderUI(QMainWindow):
             print(e)
 
     def record_audio(self, title, chunk, frames):
+        def save_vn_to_db(title, path, categories="Hızlı Sesli Not"):
+            query = "INSERT INTO voice_notes(voice_note_title, voice_note_path, voice_note_categories, voice_note_create_date)" \
+                    f"VALUES('{title}', '{path}', '{categories}', '{self.do.get_date()}')"
+            print(query)
+            self.db.insert_to_table_with_query(query)
+
         # Kayıt ayarları
         FORMAT = pyaudio.paInt16
         CHANNELS = 1
         RATE = 44100
         CHUNK = 1024
         RECORD_SECONDS = 5  # Kaydedilecek süre (saniye)
-        OUTPUT_FILENAME = f"VoiceNotes/{title}.mp3"  # Kaydedilen sesin dosya adı
+        OUTPUT_FILENAME = f"userDirectory/voiceNotes/{title}.mp3"  # Kaydedilen sesin dosya adı
+        PATH = f"userDirectory/voiceNotes/{title}.mp3"
 
         audio = pyaudio.PyAudio()
         stream = audio.open(format=FORMAT, channels=CHANNELS,
@@ -136,8 +145,8 @@ class VoiceRecorderUI(QMainWindow):
                 wf.setsampwidth(audio.get_sample_size(FORMAT))
                 wf.setframerate(RATE)
                 wf.writeframes(b''.join(frames))
-
-            print(f"Ses {OUTPUT_FILENAME} dosyasına kaydedildi.")
+            save_vn_to_db(title, PATH)
+            print(f"Ses {title} dosyasına kaydedildi.")
 
     def update_timer_label(self):
 
@@ -157,8 +166,9 @@ class VoiceRecorderUI(QMainWindow):
             self.toggle_recorder = True
             self.timer_thread = threading.Thread(target=self.update_timer_label)
             self.timer_thread.start()
-
-            self.voice_recording("ses_kayıt")
+            # Yeni kayıt ismini al
+            title = self.vn.name_for_VN()
+            self.voice_recording(title)
 
         else:
             self.toggle_recorder = False
@@ -168,33 +178,20 @@ class VoiceRecorderUI(QMainWindow):
 
         super(VoiceRecorderUI, self).__init__()
         uic.loadUi("VoiceRecord.ui", self)
-        self.setWindowOpacity(0.8)  # İstenilen saydamlık değerini ayarlayabilirsiniz (0.0 - 1.0)
+        self.setWindowOpacity(0.8)
         self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)  # Etraftaki boşları siler
+        self.setAttribute(Qt.WA_TranslucentBackground)
         self.ui = ui
-
-        self.voice_time_label = self.findChild(QLabel, "voice_time")  # Find your QLabel
-
-        passed_time = self.findChild(QLabel, "passed_time")
-        # passed_time.setText(self.vn.voice_timer())
-
+        self.voice_time_label = self.findChild(QLabel, "voice_time")
         self.micButton = self.findChild(QPushButton, "micButton")
-        self.micButton.setGeometry(100, 50, 64, 64)  # Button boyutunu ayarlayabilirsiniz.
-
-        # Saydam arka plan için stil özelliklerini ayarlayın
+        self.micButton.setGeometry(100, 50, 64, 64)
         self.micButton.setStyleSheet("background-color: transparent; border: none;")
-
-        # Ikonu butonun boyutuna göre özelleştirin
         icon = QIcon("file_imgs/mic.ico")
         pixmap = icon.pixmap(QSize(64, 64))
         self.micButton.setIcon(QIcon(pixmap))
-
-        # Butonun içeriğini tıklanabilir yapmak için QGraphicsOpacityEffect kullanın
         self.iconOpacityEffect = QGraphicsOpacityEffect()
-        self.iconOpacityEffect.setOpacity(0.5)  # İçeriği saydam yapmak için bir değer ayarlayın
+        self.iconOpacityEffect.setOpacity(0.5)
         self.micButton.setGraphicsEffect(self.iconOpacityEffect)
-
-        # Butonun sadece simge alanına tıklanabilir yapmak için QPushButton'ın içeriğini tıklanabilir yapın
         self.micButton.setIconSize(QSize(64, 64))
         self.isRecording = False
         self.toggle_recorder = False
