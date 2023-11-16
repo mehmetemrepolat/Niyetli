@@ -1,5 +1,6 @@
 import time
-from PyQt5.QtWidgets import QMainWindow, QGraphicsOpacityEffect, QTableWidget, QApplication, QLabel, QFrame, QHeaderView, QTableWidgetItem, QLineEdit, QPushButton, QTextBrowser, QRadioButton
+from PyQt5.QtWidgets import QMainWindow, QGraphicsOpacityEffect, QTableWidget, QApplication, QLabel, QFrame, \
+    QHeaderView, QTableWidgetItem, QLineEdit, QPushButton, QTextBrowser, QRadioButton, QComboBox, QVBoxLayout,  QMenu, QAction
 from PyQt5 import uic, QtCore, QtWidgets
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QPixmap, QIcon
 from PyQt5.QtCore import QThread, pyqtSignal, Qt, QTimer, QSize
@@ -12,6 +13,7 @@ from DailyTasks.voiceNotes import VoiceNotes
 from mutagen.mp3 import MP3
 import pyaudio
 import wave  # Wave modülünü de içe aktardık
+from PyQt5.QtGui import QIcon, QPixmap
 
 
 class WorkerThread(QThread):
@@ -20,8 +22,33 @@ class WorkerThread(QThread):
     def run(self):
         pass
         # while True:
-            # text = input("Eklemek istediğiniz yazıyı girin: ")
-            # self.dialogAdded.emit(text)
+        # text = input("Eklemek istediğiniz yazıyı girin: ")
+        # self.dialogAdded.emit(text)
+
+
+class SecreenTimerUI(QMainWindow):
+    def __init__(self, ui):
+        super(SecreenTimerUI, self).__init__()
+        uic.loadUi("SecreenTimer.ui", self)
+        self.setWindowOpacity(0.8)
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.ui = ui
+        # self.show()
+        self.closebtn = self.findChild(QPushButton, "closebtn")
+        self.closebtn.clicked.connect(self.close_button)
+
+    def mousePressEvent(self, event):
+        self.oldPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        delta = event.globalPos() - self.oldPos
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPos = event.globalPos()
+
+    def close_button(self):
+        self.hide()
+
 
 
 class CommandComUI(QMainWindow):
@@ -68,7 +95,6 @@ class CommandComUI(QMainWindow):
         self.ui.addToValues(command_text)
 
 
-
 class VoiceRecorderUI(QMainWindow):
     from DailyTasks.voiceNotes import VoiceNotes
     from DailyTasks.AlarmCalendarReminderOP import DateOperations
@@ -76,6 +102,7 @@ class VoiceRecorderUI(QMainWindow):
     vn = VoiceNotes()
     db = Database()
     do = DateOperations()
+
     def recorder_toggle(self, toggle):
         if toggle == 1:
             self.toggle_recorder = True
@@ -90,8 +117,7 @@ class VoiceRecorderUI(QMainWindow):
             CHANNELS = 1
             RATE = 44100
             CHUNK = 1024
-            RECORD_SECONDS = 5  # Kaydedilecek süre (saniye)
-            OUTPUT_FILENAME = f"{title}.mp3"  # Kaydedilen sesin dosya adı
+            OUTPUT_FILENAME = f"{title}.wav"  # Kaydedilen sesin dosya adı
             audio = pyaudio.PyAudio()
             # Ses kaydetme işlemi
             stream = audio.open(format=FORMAT, channels=CHANNELS,
@@ -118,15 +144,13 @@ class VoiceRecorderUI(QMainWindow):
         RATE = 44100
         CHUNK = 1024
         RECORD_SECONDS = 5  # Kaydedilecek süre (saniye)
-        OUTPUT_FILENAME = f"userDirectory/voiceNotes/{title}.mp3"  # Kaydedilen sesin dosya adı
-        PATH = f"userDirectory/voiceNotes/{title}.mp3"
+        OUTPUT_FILENAME = f"userDirectory/voiceNotes/{title}.wav"  # Kaydedilen sesin dosya adı
+        PATH = f"userDirectory/voiceNotes/{title}.wav"
 
         audio = pyaudio.PyAudio()
         stream = audio.open(format=FORMAT, channels=CHANNELS,
                             rate=RATE, input=True,
                             frames_per_buffer=chunk)
-
-        print("Kayıt başladı.")
 
         try:
             while self.toggle_recorder:
@@ -173,7 +197,6 @@ class VoiceRecorderUI(QMainWindow):
         else:
             self.toggle_recorder = False
 
-
     def __init__(self, ui):
 
         super(VoiceRecorderUI, self).__init__()
@@ -204,7 +227,6 @@ class VoiceRecorderUI(QMainWindow):
     def mousePressEvent(self, event):
         self.oldPos = event.globalPos()
 
-
     def close_button(self):
         self.hide()
 
@@ -214,9 +236,7 @@ class VoiceRecorderUI(QMainWindow):
         self.oldPos = event.globalPos()
 
 
-
 class UI(QMainWindow):
-
     db = Database()
     # sc = SecreenTimer()
     second_ui_file = "command_communication.ui"
@@ -225,112 +245,365 @@ class UI(QMainWindow):
         super(UI, self).__init__()
         self.commandCenter_button = None
         uic.loadUi("Niyetli.ui", self)
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        # ------------------------------------------------------------------------------------
+        # --------------------------------------FIND CHILD------------------------------------
+        # ------------------------------------------------------------------------------------
+
         self.label = self.findChild(QLabel, "label")
-        # self.dialogList = self.findChild(QListView, "Dialog_2")
         self.niyetli_logo = self.findChild(QLabel, "logo")
         self.hide_show = self.findChild(QPushButton, "niyetli_buton")
         self.container_history = self.findChild(QFrame, "container_history")
         self.container_Content = self.findChild(QFrame, "container_content")
         self.searchTitle = self.findChild(QLineEdit, "search")
-        # self.container_history.setStyleSheet("background-color: rgb(0, 18, 25, 0.8); border-radius: 30px;")
-        # self.container_history.setWindowOpacity(0.8)
         self.niyetli_status = self.findChild(QFrame, "frame_32")
-        self.niyetli_status.setStyleSheet("#frame_32{border-radius:25px; border:5px solid rgb(0, 18, 25); background-color: #eb0000;}")
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)  # Etraftaki boşları siler
         self.comand_comm = self.findChild(QPushButton, "commandCenter_button")
-
-
         self.nextCategory = self.findChild(QPushButton, "next_button")
-        self.nextCategory.setIcon(QIcon("file_imgs/next.ico"))
-
-        self.next_button.clicked.connect(lambda: self.change_categoryList("next"))
-
         self.previousCategory = self.findChild(QPushButton, "back_button")
-        self.previousCategory.setIcon(QIcon("file_imgs/back.ico"))
-
-        self.back_button.clicked.connect(lambda: self.change_categoryList("back"))
-
-        self.niyetli_buton.clicked.connect(self.ContainerState)
-
-        self.command_ui_isOpen = False
-        self.commandCenter_button.clicked.connect(self.command_com_state)
-
-        self.command_window = CommandComUI(self)
-
-        self.voiceRecord_window = VoiceRecorderUI(self)
-
         self.search_Button = self.findChild(QPushButton, "search_button")
-        self.searchBar_status = False
-
-        self.search_Button.setIcon(QIcon("file_imgs/search.ico"))
-        self.search_Button.clicked.connect(self.searchText)
-
         self.add_content_button = self.findChild(QPushButton, "add_content")
-        self.add_content_button.setIcon(QIcon("file_imgs/plus.ico"))
-
-
-        self.setWindowOpacity(1.0)  # İstenilen saydamlık değerini ayarlayabilirsin (0.0 - 1.0)
-
-        self.pixmap = QPixmap("Niyetli_small.png")
-        self.niyetli_logo.setPixmap(self.pixmap)
-        self.niyetli_logo.setScaledContents(True)
-        self.niyetli_logo.setAlignment(Qt.AlignJustify)  # Resmi ortalama
-
-        model = QStandardItemModel()
-        self.commands = ["command"]
-        self.notlar = []
-        self.animsat = ["1 Lorem Ipsum", "2 Lorem Ipsum", "3 Lorem Ipsum", "4 Lorem Ipsum", "5 Lorem Ipsum", "6 Lorem Ipsum"]
-        # self.current_category = "commands"  # Başlangıçta gösterilecek kategori
-        # self.previous_category = "commands"
-        self.category_title = self.findChild(QLabel, "category_title")
+        self.category_title = self.findChild(QPushButton, "category_title")
         self.QTable = self.findChild(QTableWidget, "tableWidget")
-        # self.tableWidget.setColumnCount(3)
         tableWidget = self.findChild(QTableWidget, "tableWidget")
-        tableWidget.setRowCount(len(self.commands))
-        tableWidget.setColumnCount(len(self.commands[0]))
-
-        # QTableWidget'ın başlık widget'ını al
-        header = self.tableWidget.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-
-        header_style = "QHeaderView::section { background-color: <renk>; opacity: <opaklık>; border: none;  padding-left: 5px; }"
         self.hideContainerHistory = self.findChild(QPushButton, "closebtn")
-        self.hideContainerHistory.clicked.connect(self.hide_ContainerHistory)
 
+        # ------------------------------------------------------------------------------------
+        # ----------------------------------STYLESHEET----------------------------------------
+        # ------------------------------------------------------------------------------------
 
-        # Arka plan rengini ve opaklık değerini istediğiniz şekilde değiştirin
+        self.niyetli_status.setStyleSheet("#frame_32{border-radius:25px; border:5px solid rgb(0, 18, 25); background-color: #eb0000;}")
+        header_style = "QHeaderView::section { background-color: <renk>; opacity: <opaklık>; border: none;  padding-left: 5px; }"
         header_style = header_style.replace("<renk>", "rgb(0, 18, 25)")
         header_style = header_style.replace("<opaklık>", "0.5")
+
+        # ------------------------------------------------------------------------------------
+        # -------------------------------------ICON / PNG-------------------------------------
+        # ------------------------------------------------------------------------------------
+
+        self.previousCategory.setIcon(QIcon("file_imgs/back.ico"))
+        self.nextCategory.setIcon(QIcon("file_imgs/next.ico"))
+        self.search_Button.setIcon(QIcon("file_imgs/search.ico"))
+        self.add_content_button.setIcon(QIcon("file_imgs/plus.ico"))
+        self.pixmap = QPixmap("Niyetli_small.png")
+
+        # ------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------
+
+        self.commands = ["command"]
+        self.notlar = []
+        self.animsat = ["1 Lorem Ipsum", "2 Lorem Ipsum", "3 Lorem Ipsum", "4 Lorem Ipsum", "5 Lorem Ipsum",
+                        "6 Lorem Ipsum"]
+        # ------------------------------------------------------------------------------------
+        # -----------------------------------DESIGN-------------------------------------------
+        # ------------------------------------------------------------------------------------
+
+        self.niyetli_logo.setPixmap(self.pixmap)
+        self.niyetli_logo.setScaledContents(True)
+        self.niyetli_logo.setAlignment(Qt.AlignJustify)
+        self.setWindowOpacity(1.0)
+        tableWidget.setRowCount(len(self.commands))
+        tableWidget.setColumnCount(len(self.commands[0]))
+        header = self.tableWidget.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
         self.tableWidget.horizontalHeader().setDefaultAlignment(Qt.AlignLeft)
-        self.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
-        # Stil yapısını uygula
         header.setStyleSheet(header_style)
 
-        self.tableWidget.verticalHeader().setVisible(False)
-        self.tableWidget.horizontalHeader().setVisible(False)
-        self.container_content.setVisible(False)
-        self.current_playing_row = -1
+        # ------------------------------------------------------------------------------------
+        # ---------------------------------İŞLEMLER-------------------------------------------
+        # ------------------------------------------------------------------------------------
 
-        #for row, rowData in enumerate(self.values):
-        #    item = QTableWidgetItem(str(rowData))
-        #    tableWidget.setItem(row, item)
-
-        # for i in self.values:
-        #     item = QStandardItem(i)
-        #     model.appendRow(item)
-
-        # self.dialogList.setModel(model)
-        self.tableWidget.cellEntered.connect(self.show_cell_tooltip)
-        # self.tableWidget.setToolTip("Anan")
+        self.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         self.show()
-
         self.workerThread = WorkerThread()
         self.workerThread.dialogAdded.connect(self.addDialog)
         self.workerThread.start()
-        # self.openSecondUI()
-        self.tableWidget.cellDoubleClicked.connect(self.cell_clicked)
+
+        # ------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------
+        # Buralarda bir terslik var
+        # 2 kez açtırıyor
+        self.command_ui_isOpen = False
+        self.command_window = CommandComUI(self)
+        self.voiceRecord_window = VoiceRecorderUI(self)
+        self.SecreenTimer_window = SecreenTimerUI(self)
+
+        self.searchBar_status = False
+        self.current_playing_row = -1
+
+        # ------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------
+
         self.searchTitle.setVisible(False)
+        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.horizontalHeader().setVisible(False)
+        self.container_content.setVisible(False)
+
+        # ------------------------------------------------------------------------------------
+        # ------------------------------------BUTTONS-----------------------------------------
+        # ------------------------------------------------------------------------------------
+
+        # ------------------------------------------------------------------------------------
+
+        # self.next_button.clicked.connect(lambda: self.change_categoryList("next"))
+        # self.back_button.clicked.connect(lambda: self.change_categoryList("back"))
+
+        self.next_button.clicked.connect(lambda: self.next_category(True))
+        self.back_button.clicked.connect(lambda: self.next_category(False))
+
+        # ------------------------------------------------------------------------------------
+        # ------------------------------------------------------------------------------------
+
+        self.niyetli_buton.clicked.connect(self.ContainerState)
+        self.commandCenter_button.clicked.connect(self.command_com_state)
+        self.search_Button.clicked.connect(self.searchText)
+        self.hideContainerHistory.clicked.connect(self.hide_ContainerHistory)
+        self.tableWidget.cellEntered.connect(self.show_cell_tooltip)
+        self.tableWidget.cellDoubleClicked.connect(self.cell_clicked)
+
+        self.category_title.clicked.connect(self.print_deneme)
+
+        self.menu = QMenu(self)
+        self.menu.setStyleSheet("QMenu { background-color: rgb(0, 18, 25); color: white; }")
+
+        # self.menu.addAction("Öğe 1", self.category_selected)
+        # self.menu.addAction("Öğe 2", self.category_selected)
+        for x in range(0, len(self.categories)):
+            self.menu.addAction(self.categories[x][1], self.category_selected)
+
+        for action in self.menu.actions():
+            action.setCheckable(True)
+
+        self.pointer = 0
+
+
+    def category_selected(self):
+        action = self.sender()
+        for a in self.menu.actions():
+            a.setChecked(False)
+
+        action.setChecked(True)
+
+        # print(f"Seçilen öğe: {action.text()}")
+
+
+    #     category_list = [["commands", "Komut Geçmişi"], ["notlar", "Notlar"], ["animsaticilar", "Anımsatıcılar"],
+    #                      ["Sesli Notlar", "Sesli Notlar"], ["SecreenTimer", "Ekran Süresi"]]
+
+    categories = [["commands", "Komut Geçmişi"], ["notlar", "Notlar"], ["animsaticilar", "Anımsatıcılar"],
+                     ["Sesli Notlar", "Sesli Notlar"], ["SecreenTimer", "Ekran Süresi"]]
+
+    def print_deneme(self):
+        self.menu.exec_(self.category_title.mapToGlobal(self.category_title.rect().center()))
+
+    def next_category(self, way):
+        column_names = None
+
+        try:
+            self.add_content_button.clicked.disconnect()
+        except Exception as e:
+            print(e)
+        self.db = Database()
+
+        self.tableWidget.clearContents()
+        self.tableWidget.clear()
+        category_data = None
+
+        def is_music_playing(self):
+            try:
+                return pygame.mixer.music.get_pos() > 0
+            except Exception as e:
+                print(e)
+                return False
+
+        try:
+            if way:
+                if self.pointer != len(self.categories)-1:
+                    self.pointer += 1
+                else:
+                    self.pointer = 0
+            else:
+                self.pointer -= 1
+                if self.pointer == -1:
+                    self.pointer = len(self.categories)-1
+                else:
+                    pass
+
+            self.category_title.setText(self.categories[self.pointer][1])
+
+            if self.categories[self.pointer][0] == "notlar":
+                def add_note():
+                    print("Henüz boş")
+
+                column_names = ["Not", "Kategori", "Oluşturulma Tarihi"]
+                category_data = self.db.showNotesDatas()
+                self.tableWidget.setRowCount(len(category_data))
+
+                for i in range(0, len(category_data)):
+                    self.tableWidget.setItem(i, 0, QTableWidgetItem(category_data[i][1]))
+                    self.tableWidget.setItem(i, 1, QTableWidgetItem(category_data[i][3]))
+                    self.tableWidget.setItem(i, 2, QTableWidgetItem(category_data[i][4]))
+
+
+                self.add_content_button.clicked.connect(add_note)
+
+            elif self.categories[self.pointer][0] == "animsaticilar":
+                def add_reminder():
+                    print("Henüz boş")
+
+                # reminder_enabled'ı burda kullanıcam, radyo butonunun işaretlenmesinde
+                column_names = [" ", "Anımsatıcı", "Kategori", "Hatırlatma Tarihi"]
+
+                category_data = self.db.get_reminders()
+                self.tableWidget.setRowCount(len(category_data))
+                self.tableWidget.setColumnCount(4)  # Toplam 4 sütun
+
+                self.tableWidget.setRowCount(len(category_data))
+                for i in range(0, len(category_data)):
+                    radioButton = QRadioButton()
+                    radioButton.setChecked(False)
+                    self.tableWidget.setCellWidget(i, 0, radioButton)
+                    self.tableWidget.setItem(i, 1, QTableWidgetItem(category_data[i][0]))
+                    self.tableWidget.setItem(i, 2, QTableWidgetItem(category_data[i][1]))
+                    self.tableWidget.setItem(i, 3, QTableWidgetItem(category_data[i][4]))
+
+                self.add_content_button.clicked.connect(add_reminder)
+
+            # >------------------------------------------- Sesli Notlar ----------------------------------------------<
+
+            elif self.categories[self.pointer][0] == "Sesli Notlar":
+                self.db = Database()
+
+                def stop_playing(row):
+                    try:
+                        pygame.mixer.music.stop()
+                    except Exception as e:
+                        print(e)
+                def update_buttons_state():
+                    for i in range(self.tableWidget.rowCount()):
+                        try:
+                            button = self.tableWidget.cellWidget(i, 0)
+                            if isinstance(button, QPushButton):
+                                if button.objectName() == "playButton":
+                                    pass
+                                elif button.objectName() == "stopButton" and i != self.current_playing_row:
+                                    button.setObjectName("playButton")
+                                    button.setIcon(QIcon("file_imgs/play.ico"))
+                                else:
+                                    pass
+                        except Exception as e:
+                            print(e)
+
+                def timer_changer(duration):
+                    def change():
+                        print("dur:", duration)
+                        time.sleep(duration)
+                        button.setIcon(QIcon("file_imgs/play.ico"))
+                        button.setObjectName("playButton")  # Düğmenin adını güncelle
+                        pygame.mixer.music.stop()
+                        return
+
+                    thread = threading.Thread(target=change)
+                    thread.start()
+
+                def button_clicked(row):
+                    try:
+                        if self.current_playing_row != -1:
+                            stop_playing(self.current_playing_row)  # Önceki çalma işlemi varsa durdurun
+
+                        button = self.tableWidget.cellWidget(row, 0)  # Butonun doğru satıra ait olduğundan emin ol
+                        if button.objectName() == "playButton":
+                            try:
+                                voice_name = str(self.tableWidget.item(row, 1).text())
+                                voice_path = self.db.get_sound_from_db(voice_name)
+                                voice_path2 = voice_path
+                                vn = VoiceNotes()
+                                pygame.mixer.init()
+                                pygame.mixer.music.load(voice_path2)
+                                pygame.mixer.music.play()
+                                stop_time = vn.get_voice_duration(voice_path2)
+                                timer_changer(stop_time)
+                                button.setIcon(QIcon("file_imgs/stop.ico"))
+                                button.setObjectName("stopButton")  # Düğmenin adını güncelle
+                                self.current_playing_row = row  # Mevcut çalan satırı güncelle
+                            except Exception as e:
+                                print(e)
+                        else:
+                            stop_playing(row)  # Durdurma işlemini gerçekleştir
+                            button.setIcon(QIcon("file_imgs/play.ico"))
+                            button.setObjectName("playButton")  # Düğmenin adını güncelle
+
+                        update_buttons_state()  # Tüm düğmeleri güncelle
+                    except Exception as e:
+                        print(e)
+
+                def add_voice():
+                    print("Henüz dolu")
+
+                column_names = [" ", "Not Başlığı", "Kategori"]
+                category_data = self.db.show_voiceNotes()
+
+                self.tableWidget.setRowCount(len(category_data))
+                self.tableWidget.setColumnCount(3)  # Toplam 3 sütun
+
+                for i in range(0, len(category_data)):
+                    button = QPushButton()
+                    button.setIcon(QIcon("file_imgs/play.ico"))
+                    button.setStyleSheet("text-align: left; padding-left: 0px;")  # ikonu sola hizala
+                    button.setObjectName("playButton")  # Düğmenin adını belirle
+                    self.tableWidget.setCellWidget(i, 0, button)
+                    self.tableWidget.setItem(i, 1, QTableWidgetItem(category_data[i][0]))
+                    self.tableWidget.setItem(i, 2, QTableWidgetItem(category_data[i][2]))
+                    button.clicked.connect(lambda _, r=i: button_clicked(r))
+
+                self.add_content_button.clicked.connect(self.openVoiceRecorderUI)
+
+            elif self.categories[self.pointer][0] == "SecreenTimer":
+
+                column_names = ["Program İsmi", "Süre(dk)", "Tekrar"]
+                category_data = self.db.get_timer_statics()
+                self.add_content_button.setIcon(QIcon("file_imgs/plus.ico"))
+                # Bu sekmede bugünün kayıtları eklensin. Oluşturulabiliyorsa dünün de kayıtları eklenir.
+                self.tableWidget.setRowCount(len(category_data))
+
+                for i in range(0, len(category_data)):
+                    self.tableWidget.setItem(i, 0, QTableWidgetItem(category_data[i][0]))
+                    self.tableWidget.setItem(i, 1, QTableWidgetItem(category_data[i][1]))
+                    self.tableWidget.setItem(i, 2, QTableWidgetItem(category_data[i][3]))
+
+                self.add_content_button.clicked.connect(self.openSecreenTimerUI)
+
+
+            elif self.categories[self.pointer][0] == "commands":
+                column_names = ["Geçmiş Komutlar"]
+                category_data = self.db.showCommands()  # command, command_process
+
+
+
+            else:
+                print("Büyük Hata")
+
+
+            self.tableWidget.setColumnCount(len(column_names))
+            self.tableWidget.setHorizontalHeaderLabels(column_names)
+            self.tableWidget.horizontalHeader().setVisible(True)
+            self.tableWidget.horizontalHeader().setSectionResizeMode(0,
+                                                                     QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+            self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+            print(self.categories[self.pointer][1])
+
+
+        except Exception as e:
+            print(e)
+
+    # def pre_category(self):
+    #
+    #     print(self.pointer)
 
     def searchText(self):
         if self.searchBar_status:
@@ -350,8 +623,6 @@ class UI(QMainWindow):
             self.tableWidget.setToolTip(tooltip_text)
         else:
             self.tableWidget.setToolTip("")
-
-
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
@@ -408,11 +679,11 @@ class UI(QMainWindow):
 
         # self.container_Title.setText(contents[1])
 
-    category_list = [["commands", "Komut Geçmişi"], ["notlar", "Notlar"], ["animsaticilar", "Anımsatıcılar"], ["Sesli Notlar", "Sesli Notlar"], ["SecreenTimer", "Ekran Süresi"]]
+    category_list = [["commands", "Komut Geçmişi"], ["notlar", "Notlar"], ["animsaticilar", "Anımsatıcılar"],
+                     ["Sesli Notlar", "Sesli Notlar"], ["SecreenTimer", "Ekran Süresi"]]
     # Bu kısım daha sonraları veritabanından otomatik olarak çekilecek. Veritabanı güncellendiği zaman burası da güncellenecek
     category_counter = 0
     current_category = category_list[0][0]
-
 
     def change_categoryList(self, way):
         global tableWidget
@@ -431,6 +702,13 @@ class UI(QMainWindow):
                 return False
 
         def category_changer(index):
+
+            def category_reload():
+
+                tableWidget.clearContents()
+                tableWidget.clear()
+
+
             if index == len(self.category_list):
                 self.category_counter = 0
                 index = 0
@@ -448,31 +726,62 @@ class UI(QMainWindow):
                 self.current_category = self.category_list[index][0]
                 self.category_title.setText(label_name)
 
+                # >------------------------------------------- Commands -----------------------------------------------<
+
                 if self.category_list[index][0] == "commands":
+
+                    self.add_content_button.setIcon(QIcon())
                     command_list = self.db.showCommands()
                     content_data = command_list
+                    self.db = Database()
+                    self.stat = self.db.showCommands()
+                    column_headers = ["Komut"]
+                    sutun1 = column_headers[0]
+                    tableWidget.setHorizontalHeaderLabels(column_headers)
+                    tableWidget.horizontalHeader().setVisible(True)
+                    header_item1 = QTableWidgetItem(sutun1)
+                    tableWidget.setHorizontalHeaderItem(0, header_item1)
+
+                    tableWidget.horizontalHeader().setSectionResizeMode(0,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                    tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+                # >--------------------------------------------- Notes ------------------------------------------------<
 
                 elif self.category_list[index][0] == "notlar":
+                    self.add_content_button.setIcon(QIcon("file_imgs/plus.ico"))
+
                     content_data = self.db.showNotesDatas()
                     note_list = []
                     notes_contents = []
                     # Burada for ile data yüklemesi gerçekleştirmemiz gerekiyor.
                     for x in range(0, len(content_data)):
                         note_list.append(content_data[x][1])
-                        notes_contents.append([content_data[x][0], content_data[x][2], content_data[x][3], content_data[x][4]])
+                        notes_contents.append(
+                            [content_data[x][0], content_data[x][2], content_data[x][3], content_data[x][4]])
                     content_data = note_list
                     # print(notes_contents)
 
+                # >------------------------------------------- Reminders ----------------------------------------------<
+
                 elif self.category_list[index][0] == "animsaticilar":
                     content_data = self.animsat
+
+                # >------------------------------------------ Voice Notes ---------------------------------------------<
+
                 elif self.category_list[index][0] == "Sesli Notlar":
                     voice_notes = self.db.show_voiceNotes()
+                    self.add_content_button.setIcon(QIcon("file_imgs/plus.ico"))
+                    print("Deneme yazısı")
                     content_data = voice_notes
+
+                # >------------------------------------------ Secreen Timer -------------------------------------------<
+
                 elif self.category_list[index][0] == "SecreenTimer":
                     content_data = self.db.show_onlyNotes()
 
                 # elif self.category_list[index][0] == "SecreenTimer":
-                    # secren_time_datas = self.sc.get_statistics()
+                # secren_time_datas = self.sc.get_statistics()
 
                 else:
                     print("Hata!")
@@ -509,26 +818,30 @@ class UI(QMainWindow):
             except Exception as e:
                 print(e)
 
-
         try:
             tableWidget = self.findChild(QTableWidget, "tableWidget")
             tableWidget.clearContents()  # Tablonun içeriğini temizle
             tableWidget.setRowCount(len(data))  # Satır sayısını güncelle
+            try:
+                self.add_content_button.clicked.disconnect()
+            except Exception as e:
+                pass
+
+
             tableWidget.setColumnCount(1)  # Sadece bir sütun olduğunu belirt
         except Exception as e:
             print("Hata:", e)
         try:
             for row, value in enumerate(data):
 
-                # >------------------------------------------- Sesli Notlar ----------------------------------------------<
-
+                # >------------------------------------------ Sesli Notlar --------------------------------------------<
                 # Parça durduğunda/bittiğinde ikon değişmiyor.
                 # Muhtemelen Thread çalışmıyor olabilir. Kontrol edilmesi gerekiyor.
 
                 if self.current_category == "Sesli Notlar":
+                    self.db = Database()
                     tableWidget.setColumnCount(2)  # Sadece 2 sütun olduğunu belirt
                     tableWidget.horizontalHeader().setVisible(False)
-
                     self.add_content_button.clicked.connect(self.openVoiceRecorderUI)
 
                     button = QPushButton()
@@ -546,7 +859,8 @@ class UI(QMainWindow):
                                 try:
                                     voice_name = str(tableWidget.item(row, 1).text())
                                     voice_path = self.db.get_sound_from_db(voice_name)
-                                    voice_path2 = f"userDirectory/voiceNotes/{voice_path}"
+                                    voice_path2 = voice_path
+                                    print(voice_path2)
                                     vn = VoiceNotes()
                                     pygame.mixer.init()
                                     pygame.mixer.music.load(voice_path2)
@@ -563,7 +877,7 @@ class UI(QMainWindow):
                                 button.setIcon(QIcon("file_imgs/play.ico"))
                                 button.setObjectName("playButton")  # Düğmenin adını güncelle
 
-                            update_buttons_state()  # Tüm düğmeleri güncelle
+                            self.update_buttons_state()  # Tüm düğmeleri güncelle
                         except Exception as e:
                             print(e)
 
@@ -573,20 +887,7 @@ class UI(QMainWindow):
                         except Exception as e:
                             print(e)
 
-                    def update_buttons_state():
-                        for i in range(tableWidget.rowCount()):
-                            try:
-                                button = tableWidget.cellWidget(i, 0)
-                                if isinstance(button, QPushButton):
-                                    if button.objectName() == "playButton":
-                                        pass
-                                    elif button.objectName() == "stopButton" and i != self.current_playing_row:
-                                        button.setObjectName("playButton")
-                                        button.setIcon(QIcon("file_imgs/play.ico"))
-                                    else:
-                                        pass
-                            except Exception as e:
-                                print(e)
+
 
                     def timer_changer(duration):
                         def change():
@@ -596,9 +897,9 @@ class UI(QMainWindow):
                             button.setObjectName("playButton")  # Düğmenin adını güncelle
                             pygame.mixer.music.stop()
                             return
+
                         thread = threading.Thread(target=change)
                         thread.start()
-
 
                     try:
                         button.clicked.connect(lambda _, r=row: button_clicked(
@@ -609,32 +910,30 @@ class UI(QMainWindow):
                     tableWidget.setCellWidget(row, 0, button)
                     item = QTableWidgetItem(str(value))  # Değeri doğrudan al
                     tableWidget.setItem(row, 1, item)
-                    tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
-                    tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(0,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(1,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
                 # >--------------------------------------------- Commands ------------------------------------------------<
 
                 elif self.current_category == "commands":
-                    stat = self.db.showCommands()
-                    column_headers = ["Komut"]
-                    sutun1 = column_headers[0]
-                    tableWidget.setHorizontalHeaderLabels(column_headers)
-                    tableWidget.horizontalHeader().setVisible(True)
 
-                    header_item1 = QTableWidgetItem(sutun1)
-                    tableWidget.setHorizontalHeaderItem(0, header_item1)
 
-                    for i, data in enumerate(stat):
+                    for i, data in enumerate(self.stat):
                         komut = data[0]
                         tableWidget.setItem(i, 0, QTableWidgetItem(komut))
 
-                    tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
-                    tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-
-                # >------------------------------------------- SecreenTimer ----------------------------------------------<
+                # >------------------------------------------ SecreenTimer --------------------------------------------<
 
                 elif self.current_category == "SecreenTimer":
+                    self.db = Database()
+
                     stat = self.db.get_timer_statics()
+
+                    self.add_content_button.clicked.connect(self.openSecreenTimerUI)
+
                     column_headers = ['Program İsmi', 'Süre(dk)', 'Tekrar']
                     sutun1 = column_headers[0]
                     sutun2 = column_headers[1]
@@ -664,10 +963,15 @@ class UI(QMainWindow):
                         tableWidget.setItem(i, 1, QTableWidgetItem(str(int(sure))))
                         tableWidget.setItem(i, 2, QTableWidgetItem(tekrar))
 
-                    tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
-                    tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)  # İkinci sütunu içeriğe göre genişlet
-                    tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)  # Üçüncü sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(0,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(1,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # İkinci sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(2,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # Üçüncü sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
+
                 # animsaticilar
 
                 # Yapılacak işlem basit
@@ -678,6 +982,8 @@ class UI(QMainWindow):
                 # string tarih verisi çekicez
 
                 elif self.current_category == "animsaticilar":
+                    print("deneme 2")
+
                     tableWidget.setColumnCount(2)  # Sadece 2 sütun olduğunu belirt
                     tableWidget.horizontalHeader().setVisible(False)
                     radioButton = QRadioButton()
@@ -688,6 +994,7 @@ class UI(QMainWindow):
                             pass
                         except Exception as e:
                             print("Anımsatıcılarda Hata! ", e)
+
                     if row == 0:
                         tableWidget.setItem(row, 0, QTableWidgetItem('Bugün'))  # Yazı büyütünu büyütmek gerekir
                         tableWidget.setSpan(row, 0, 1, 2)
@@ -699,20 +1006,23 @@ class UI(QMainWindow):
                         item = QTableWidgetItem(str(value))
                         tableWidget.setItem(row, 1, item)
 
-                        tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
-                        tableWidget.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
+                        tableWidget.horizontalHeader().setSectionResizeMode(0,
+                                                                            QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                        tableWidget.horizontalHeader().setSectionResizeMode(1,
+                                                                            QHeaderView.ResizeToContents)  # ikinci sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
-                # >---------------------------------------------- Notlar -------------------------------------------------<
+                # >-------------------------------------------- Notlar ------------------------------------------------<
                 elif self.current_category == "notlar":
+                    self.db = Database()
                     notes = self.db.showNotesDatas()
                     tableWidget.horizontalHeader().setVisible(False)
-                    column_headers = ['Not Başlığı', 'Kategori', 'Tarih']
-                    sutun1 = column_headers[0]
-                    sutun2 = column_headers[1]
-                    sutun3 = column_headers[2]
+                    self.column_headers = ['Not Başlığı', 'Kategori', 'Tarih']
+                    sutun1 = self.column_headers[0]
+                    sutun2 = self.column_headers[1]
+                    sutun3 = self.column_headers[2]
                     tableWidget.setColumnCount(3)  # Sadece 2 sütun olduğunu belirt
-                    tableWidget.setHorizontalHeaderLabels(column_headers)
+                    tableWidget.setHorizontalHeaderLabels(self.column_headers)
                     tableWidget.horizontalHeader().setVisible(True)
                     # İlk sütuna sütun başlığını ekleyin
                     header_item1 = QTableWidgetItem(sutun1)
@@ -723,25 +1033,22 @@ class UI(QMainWindow):
                     # Üçüncü sütuna sütun başlığını ekleyin
                     header_item3 = QTableWidgetItem(sutun3)
                     tableWidget.setHorizontalHeaderItem(2, header_item3)
-
                     for i, data in enumerate(notes):
                         note_title = data[1]
                         note_category = data[3]
                         note_date = data[4]
-
                         tableWidget.setItem(i, 0, QTableWidgetItem(note_title))
                         tableWidget.setItem(i, 1, QTableWidgetItem(note_category))
                         tableWidget.setItem(i, 2, QTableWidgetItem(note_date))
-
-                    tableWidget.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
-                    tableWidget.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)  # İkinci sütunu içeriğe göre genişlet
-                    tableWidget.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)  # Üçüncü sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(0,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # İlk sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(1,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # İkinci sütunu içeriğe göre genişlet
+                    tableWidget.horizontalHeader().setSectionResizeMode(2,
+                                                                        QtWidgets.QHeaderView.ResizeToContents)  # Üçüncü sütunu içeriğe göre genişlet
                     tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
-
-
-
-                # >----------------------------------------------- Else --------------------------------------------------<
+                # >--------------------------------------------- Else -------------------------------------------------<
 
                 else:
                     tableWidget.horizontalHeader().setVisible(False)
@@ -751,30 +1058,24 @@ class UI(QMainWindow):
         except Exception as e:
             print(e)
 
-
-
-
     def category_voice_notes(self):
         return None
 
-
-
-
-#
-#    def play_voice_note(self, voice_title):
-#        try:
-#            path = self.db.get_sound_from_db(voice_title)
-#            # print("yol:", path)
-#
-#            def play_thread():
-#                pygame.mixer.init()
-#                pygame.mixer.music.load(path)
-#                pygame.mixer.music.play()
-#                # Burada stop kısmını eklememiz gerekiyor
-#            thread = threading.Thread(target=play_thread)
-#            thread.start()
-#        except Exception as e:
-#            print(e)
+    #
+    #    def play_voice_note(self, voice_title):
+    #        try:
+    #            path = self.db.get_sound_from_db(voice_title)
+    #            # print("yol:", path)
+    #
+    #            def play_thread():
+    #                pygame.mixer.init()
+    #                pygame.mixer.music.load(path)
+    #                pygame.mixer.music.play()
+    #                # Burada stop kısmını eklememiz gerekiyor
+    #            thread = threading.Thread(target=play_thread)
+    #            thread.start()
+    #        except Exception as e:
+    #            print(e)
 
     def mousePressEvent(self, event):
         self.oldPos = event.globalPos()
@@ -793,6 +1094,7 @@ class UI(QMainWindow):
     #     self.niyetli_logo.setPixmap(scaledPixmap)
 
     def addToValues(self, command_text=None):
+        print("deneme 2")
         text = command_text
         model = self.dialogList.model()
         item = QStandardItem(text)
@@ -801,6 +1103,7 @@ class UI(QMainWindow):
         # self.command.clear()
 
     def addDialog(self, text):
+        print("deneme 1")
         model = self.dialogList.model()
         item = QStandardItem(text)
         model.appendRow(item)
@@ -811,6 +1114,13 @@ class UI(QMainWindow):
         else:
             self.container_history.setVisible(True)
 
+    def openSecreenTimerUI(self):
+        self.SecreenTimer_window = SecreenTimerUI(self)
+        self.SecreenTimer_window.show()
+
+    def closeSecreenTimerUI(self):
+        self.SecreenTimer_window = SecreenTimerUI(self)
+        self.SecreenTimer_window.show()
 
     def openVoiceRecorderUI(self):
         self.voiceRecord_window = VoiceRecorderUI(self)
@@ -823,7 +1133,6 @@ class UI(QMainWindow):
     def openCommandUI(self):
         self.command_window = CommandComUI(self)
         self.command_window.show()
-
 
     def closeCommandUI(self):
         if self.command_window is not None and self.command_window.isVisible():
@@ -846,6 +1155,7 @@ app = QApplication(sys.argv)
 ui_window = UI()
 command_window = CommandComUI(ui_window)
 voiceRecord_window = VoiceRecorderUI(ui_window)
+SecreenTimer_window = SecreenTimerUI(ui_window)
 # voiceRecord_window.show()
 # command_window.show()
 app.exec_()
