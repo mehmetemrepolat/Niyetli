@@ -1,3 +1,4 @@
+import threading
 from datetime import datetime, date, timedelta
 from win32api import *
 from win32gui import *
@@ -6,14 +7,20 @@ import sys
 import os
 import time
 from winotify import Notification
+import pygame
+from playsound import playsound
+import mutagen
 
 class DateOperations:
 
+    # 2023-11-13
     def get_date(self, today_d=date.today()):
         if today_d != date.today():
             return date.today() + timedelta(today_d)
         else:
             return today_d
+
+    # 13 Kasım Pazartesi
 
     @staticmethod
     def get_string_date(date_str):
@@ -35,52 +42,6 @@ class DateOperations:
     def get_date_only_number(self, date_input):
         return date_input.split()[1].replace(",", "")
 
-    @staticmethod
-    def show_balloon(not_title, not_msg):
-        cwd = os.getcwd()
-        icon_path = os.path.join(cwd, "Niyetli.ico")
-        toast = Notification(
-            app_id="Niyetli",
-            title=f"{not_title}",
-            msg=f"{not_msg}",
-            duration="long",
-            icon=icon_path
-        )
-        return toast.show()
-
-    @staticmethod
-    def show_balloon2(self, title, msg):
-        message_map = {
-            win32con.WM_DESTROY: self.OnDestroy,
-        }
-        wc = WNDCLASS()
-        hinst = wc.hInstance = GetModuleHandle(None)
-        wc.lpszClassName = "PythonTaskbar"
-        wc.lpfnWndProc = message_map
-        classAtom = RegisterClass(wc)
-        style = win32con.WS_OVERLAPPED | win32con.WS_SYSMENU
-        hwnd = CreateWindow(classAtom, "Taskbar", style, 0, 0, win32con.CW_USEDEFAULT, win32con.CW_USEDEFAULT, 0, 0, hinst, None)
-        UpdateWindow(hwnd)
-        iconPathName = os.path.abspath(os.path.join(sys.path[0], "Niyetli.ico"))
-        icon_flags = win32con.LR_LOADFROMFILE | win32con.LR_DEFAULTSIZE
-        try:
-            hicon = LoadImage(hinst, iconPathName, win32con.IMAGE_ICON, 0, 0, icon_flags)
-        except:
-            hicon = LoadIcon(0, win32con.IDI_APPLICATION)
-        flags = NIF_ICON | NIF_MESSAGE | NIF_TIP
-        nid = (hwnd, 0, flags, win32con.WM_USER + 20, hicon, "tooltip")
-        Shell_NotifyIcon(NIM_ADD, nid)
-        Shell_NotifyIcon(NIM_MODIFY, (hwnd, 0, NIF_INFO, win32con.WM_USER + 20, hicon, "Balloon  tooltip", msg, 200, title))
-        time.sleep(5)
-        DestroyWindow(hwnd)
-
-
-    def OnDestroy(self, hwnd, msg, wparam, lparam):
-        nid = (hwnd, 0)
-        Shell_NotifyIcon(NIM_DELETE, nid)
-        PostQuitMessage(0)
-        return 0
-
     def get_date_info(self, date_str):
         date_format = "%Y-%m-%d"
         date_obj = datetime.strptime(date_str, date_format).date()
@@ -99,42 +60,83 @@ class DateOperations:
         else:
             return "Geçen Ay"
 
+class AlarmAndNotificationOperations:
+
+
+    def play_sound(self, path, mode):
+        def get_voice_duration(title):
+            audio = mutagen.File(title)
+            duration_s = audio.info.length
+            return int(duration_s) + 1
+
+        try:
+            def play_thread():
+                pygame.mixer.init()
+                pygame.mixer.music.load(path)
+                if mode == 'alarm':
+                    pygame.mixer.music.play(loops=-1)
+                    time.sleep(30)
+                    pygame.mixer.music.stop()
+                    pygame.quit()
+                elif mode == 'notification':
+                    pygame.mixer.music.play()
+                    time.sleep(get_voice_duration(path))
+                    pygame.mixer.music.stop()
+                    pygame.quit()
+
+            thread = threading.Thread(target=play_thread)
+            thread.start()
+
+        except Exception as e:
+            print("AlarmAndNotificationOperations.play_sound Error")
+
+
+    def show_balloon(self, not_title, not_msg, mode = 'notification'):
+        # Ayrı bir veritabanı bağlantısı gerekebilir.
+        # Kullanıcının kendi localinde bulunan bir veritabanı bağlantısı.
+        # Veya veritabanı yerine bilgilerin tutulacağı bir dosya gerekebilir.
+
+        if mode == 'notification':
+            duration = "short"
+            sound_path = "sounds/notification2.wav"  # Bunu veritabanından çekebilir hale gelmemiz gerekiyor.
+            self.play_notification_sound = threading.Thread(target=self.play_sound, args=(sound_path, mode))
+            self.play_notification_sound.start()
+
+        elif mode == 'alarm':
+            duration = "long"
+            sound_path = "sounds/alarm1.wav"
+            for x in range(0, 5):
+                self.play_notification_sound = threading.Thread(target=self.play_sound, args=(sound_path, mode))
+                self.play_notification_sound.start()
+
+
+        else:
+            print("Hata! AlarmAndNotificationOperations")
+
+
+        cwd = os.getcwd()
+        icon_path = os.path.join(cwd, "Niyetli.ico")
+        toast = Notification(
+            app_id="Niyetli",
+            title=f"{not_title}",
+            msg=f"{not_msg}",
+            duration=duration,
+            icon=icon_path
+        )
+        return toast.show()
+
+
+
+
+# ano = AlarmAndNotificationOperations()
+# ano.show_balloon("Deneme", "Deneme mesajı", "notification")
+
+# play_sound('sounds/notification2.wav')
 
 # ----- Deneme Kod Alanı ------ #
-# Buradaki kodları Niyetli.py' geçireceğim. Bu şekilde verilerde tarih düzenlemesini
-#   düzgün bir şekilde gerçekleştirebilirim.
-#
-# do = DateOperations()
-# datas = [["Not 1", "2023-07-01"], ["Not 1 ama uzun olan", "2023-07-01"], ["Not 2", "2023-07-11"], ["Not 3", "2023-07-17"]]
-#
-# temp_date = datas[0][1]
-#
-# for x in range(0, len(datas)):
-#     title = do.get_date_info(datas[x][1])
-#     if x == 0:
-#         print(f"---{title}----")
-#         print(f"----{datas[x][0]}----")
-#
-#     else:
-#         if temp_date == datas[x][1]:
-#             print(f"----{datas[x][0]}----")
-#
-#         else:
-#             temp_Date = datas[x][1]
-#             title = do.get_date_info(temp_Date)
-#             print(f"---{title}----")
-#             print(f"----{datas[x][0]}----")
-#
 
-# ----- Deneme Kod Alanı ------ #
 
-# do = DateOperations()
-# print(do.get_date("2023-06-30"))  # Geçen Ay
-# print(do.get_date("2023-07-15"))  # Geçen Hafta
-# print(do.get_date("2023-07-17"))  # Dün
-# print(do.get_date("2023-07-18"))  # Bugün
 
-# show_balloon("Niyetli'den mesaj var!", "Hatalar düzeltildi, Performans iyileştirmeleri yapıldı, Kedi videolarıyla kalpler eridi.")
 # today = datetime.today()
 # tomorrow = datetime.today()+timedelta(+1)
 # print(datetime.now().strftime("%H:%M"))
