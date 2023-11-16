@@ -189,7 +189,7 @@ class Database:
         mycursor = self.db.cursor()
         mycursor.execute(query)
         result = mycursor.fetchall()
-        result = [(row[0]) for row in result]
+        result = [(row[0], row[1], row[2]) for row in result]
         return result
 
 
@@ -232,11 +232,11 @@ class Database:
 # >------------------------------------------------------------------------------------------------<
 
     def get_reminders(self):
-        query = "SELECT  FROM notes ORDER BY note_id"
+        query = "SELECT reminder, reminder_category, reminder_create_date, reminder_create_time, reminder_date, reminder_time, reminder_enabled FROM reminder ORDER BY reminder_id"
         mycursor = self.db.cursor()
         mycursor.execute(query)
         result = mycursor.fetchall()
-        result = [(row[0], row[1]) for row in result]
+        result = [(row[0], row[1], row[2], row[3], datetime.datetime.strptime(str(row[4]), "%Y-%m-%d").date().strftime("%d-%m-%Y"), row[5], row[6]) for row in result]
         return result
 
     def reminder_add(self, reminder, reminder_date, reminder_time, reminder_category='1', attachment='', reminder_enabled='1'):
@@ -335,10 +335,17 @@ class Database:
             print("Data added")
             return
 
-    def get_timer_statics(self, number_of_stat=None, days_stat=-1):
+    def get_timer_statics(self, number_of_stat=None, today_records=True, days_stat=-1):
+
         query = f"SELECT program_name, secreen_time, secreen_date, day_counter FROM secreen_timer"
-        if number_of_stat is not None:
-            query += f" LIMIT {number_of_stat}"
+        if today_records:
+            query += f' WHERE DATE(secreen_date) = DATE(NOW());'
+        else:
+            if number_of_stat is not None:
+                query += f" LIMIT {number_of_stat}"
+            else:
+                pass
+
 
         mycursor = self.db.cursor()
         mycursor.execute(query)
@@ -362,6 +369,4 @@ class Database:
         result = mycursor.fetchone()
         result = result[0]
         return result
-
-
 

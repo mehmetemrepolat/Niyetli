@@ -2,7 +2,7 @@ import pygame
 import threading
 #from Niyetli.database.db_connector import Database
 import time
-from mutagen.mp3 import MP3
+import mutagen
 import os
 
 
@@ -28,7 +28,8 @@ class VoiceNotes:
 
 
     def get_voice_duration(self, title):
-        audio = MP3(title)
+
+        audio = mutagen.File(title)
         duration_s = audio.info.length
         return int(duration_s) + 1
 
@@ -74,5 +75,7 @@ class VoiceNotes:
 
 
 # vc = VoiceNotes()
+# vc.play_voice_note("sounds/notification2.wav")
+
 # print(vc.name_for_VN())
 # vc.passingTime()
