@@ -66,6 +66,11 @@
   - Diyalogları ve Komutları kaydedecek şekilde arayüz üzerinde gösterim gerçekleştirebilme
   - Arayüzde buton ile aktifleştirme-pasifleştirme
   - Aktif-Pasif renk geçişleri
+    
+- Parola Yöneticisi
+  - Kullanıcılar, şifrelerini bu sayede lokal olarak kaydedebilecekler.
+  - Şifreler anahtar yardımıyla daha karmaşık hale getirilip yine anahtar yardımıyla çözülebilir.
+  - Şifrelerin güvenliği konusunda, kullanıcı sorumludur. Anahtarı kaybetmesi durumunda şifrelerin çözülmesi imkansız olacaktır.
 <h3>Tasarlanan arayüzden görüntüler:</h3>
 
 1-  [![image](https://github.com/mehmetemrepolat/Niyetli/assets/97759584/dbcc3b21-4a4a-49e1-b90e-600ddcb57c85)](#)
